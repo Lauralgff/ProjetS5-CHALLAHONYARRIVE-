@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Project/Maven2/JavaApp/src/main/java/${packagePath}/${mainClassName}.java to edit this template
  */
-
 package fr.insa.legoff_venet.projet.projets5encheres;
 
 import fr.insa.legoff_venet.projet.utils.Console;
@@ -17,13 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import fr.insa.legoff_venet.projet.utils.Lire;
+import java.util.Date;
 
 /**
  *
  * @author i5e330
  */
 public class ProjetS5Encheres {
-    
+
     public static Connection connectGeneralPostGres(String host,
             int port, String database,
             String user, String pass)
@@ -249,6 +250,84 @@ public class ProjetS5Encheres {
         }
     }
 
+    public static int createUtilisateur2(Connection con)
+            throws SQLException {
+        con.setAutoCommit(false);
+        try ( PreparedStatement chercheNom = con.prepareStatement(
+                "select id from utilisateur1 where nom = ?")) {
+//            chercheNom.setString(1, Lire.S());
+//            ResultSet testNom = chercheNom.executeQuery();
+//            if (testNom.next()) {
+//                throw new NomExisteDejaException();
+//            }
+            try ( PreparedStatement pst = con.prepareStatement(
+                    """
+                    insert into utilisateur1 (nom,prenom,email,pass,codepostal) values (?,?,?,?,?) 
+                    """, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                System.out.println("Nom : ");
+                pst.setString(1, Lire.S());
+                System.out.println("Prénom : ");
+                pst.setString(2, Lire.S());
+                System.out.println("e-mail : ");
+                pst.setString(3, Lire.S());
+                System.out.println("Mot de passe : ");
+                pst.setString(4, Lire.S());
+                System.out.println("Code postal : ");
+                pst.setString(5, Lire.S());
+                pst.executeUpdate();
+                con.commit();
+
+                try ( ResultSet rid = pst.getGeneratedKeys()) {
+                    rid.next();
+                    int id = rid.getInt(1);
+                    return id;
+                }
+            }
+        } catch (Exception ex) {
+            con.rollback();
+            throw ex;
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
+
+    public static Date GetDate(int nbjr) {
+        long milliseconds = System.currentTimeMillis();
+        Date date = new Date(milliseconds + nbjr * 86400000);
+        // Il y a 86400000 ms dans une journée
+        return date;
+    }
+
+    public static java.sql.Timestamp convert(java.util.Date date) {
+        return new java.sql.Timestamp(date.getTime());
+    }
+
+    public static int createCategorie(Connection con) throws SQLException {
+        con.setAutoCommit(false);
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+                insert into categorie1 (nom) values (?)
+                """, Statement.RETURN_GENERATED_KEYS)) {
+            System.out.println("Nom de la catégorie : ");
+            pst.setString(1, Lire.S());
+            pst.executeUpdate();
+            con.commit();
+
+            try ( ResultSet rid = pst.getGeneratedKeys()) {
+                rid.next();
+                int id = rid.getInt(1);
+                return id;
+            }
+        } catch (Exception ex) {
+            con.rollback();
+            throw ex;
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
+//TODO : régler le pb des Timestamp
+//      permettre de créer un objet "spontanément" 
+
     public static int createObjet(Connection con, String titre, String description,
             Timestamp debut, Timestamp fin, int prixbase, int categorie, int proposepar)
             throws SQLException {
@@ -265,6 +344,76 @@ public class ProjetS5Encheres {
             pst.setInt(5, prixbase);
             pst.setInt(6, categorie);
             pst.setInt(7, proposepar);
+            pst.executeUpdate();
+            con.commit();
+
+            try ( ResultSet rid = pst.getGeneratedKeys()) {
+                rid.next();
+                int id = rid.getInt(1);
+                return id;
+            }
+        } catch (Exception ex) {
+            con.rollback();
+            throw ex;
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
+
+    public static int createObjet2(Connection con) throws SQLException {
+        con.setAutoCommit(false);
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+            insert into objet1 (titre,description,debut,fin,prixbase,categorie,
+                proposepar) values (?,?,?,?,?,?,?)
+            """, Statement.RETURN_GENERATED_KEYS)) {
+            System.out.println("Titre : ");
+            pst.setString(1, Lire.S());
+            System.out.println("Description : ");
+            pst.setString(2, Lire.S());
+            pst.setTimestamp(3, convert(GetDate(0)));
+            System.out.println("Combien de jours durera l'enchère ?");
+            pst.setTimestamp(4, convert(GetDate(Lire.i())));
+            System.out.println("Prix de base de l'objet (en centimes) : ");
+            pst.setInt(5, Lire.i());
+            System.out.println("Catégorie de l'objet : ");
+            pst.setInt(6, Lire.i());
+//TODO : faire en sorte que le nom d'utilisateur soit défini 
+//      en fonction de l'utilisateur connecté
+            System.out.println("Votre id d'utilisateur : ");
+            pst.setInt(7, Lire.i());
+            pst.executeUpdate();
+            con.commit();
+
+            try ( ResultSet rid = pst.getGeneratedKeys()) {
+                rid.next();
+                int id = rid.getInt(1);
+                return id;
+            }
+        } catch (Exception ex) {
+            con.rollback();
+            throw ex;
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
+
+//TODO : finaliser méthode, insérer condition montant supérieur à prixbase
+    public static int createEnchere(Connection con, int de, int sur,
+            Timestamp quand, int montant) throws SQLException {
+        con.setAutoCommit(false);
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+                insert into enchere1 (de,sur,quand,montant) values (?,?,?,?)
+                """, Statement.RETURN_GENERATED_KEYS)) {
+            System.out.println("Id de l'enchérisseur : ");
+            pst.setInt(1, Lire.i());
+            System.out.println("Id de l'objet : ");
+            pst.setInt(2, Lire.i());
+            pst.setTimestamp(3, convert(GetDate(0)));
+            System.out.println("Montant proposé : ");
+            //if (Lire.i()<=Objet.)
+            pst.setInt(4, Lire.i());
             pst.executeUpdate();
             con.commit();
 
@@ -319,7 +468,8 @@ public class ProjetS5Encheres {
 
     public static void afficheTousLesObjets(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
-            try ( ResultSet tlu = st.executeQuery("select id,titre,description,debut,fin,prixbase,categorie,proposepar")) {
+            try ( ResultSet tlu = st.executeQuery("select id,titre,description,"
+                    + "debut,fin,prixbase,categorie,proposepar")) {
                 System.out.println("Liste des objets");
                 System.out.println("----------------");
                 while (tlu.next()) {
@@ -355,6 +505,22 @@ public class ProjetS5Encheres {
                             rs.getTimestamp("fin"), rs.getInt("prixbase"),
                             rs.getInt("categorie"), rs.getInt("proposepar")));
                 }
+            }
+        }
+        return res;
+    }
+
+    public static List<Enchere> listeEncheres(Connection con) throws SQLException {
+        List<Enchere> res = new ArrayList<>();
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select enchere1.id as enchereid,de,sur,quand,montant from enchere1"
+                + "join utilisateur1 on enchere1.de = utilisateur1.id"
+                + "join objet1 on enchere1.sur = objet1.id"
+                + "order by quand desc")) {
+            try ( ResultSet rs = pst.executeQuery()) {
+                res.add(new Enchere(rs.getInt("enchereid"), rs.getInt("de"),
+                        rs.getInt("sur"), rs.getTimestamp("quand"),
+                        rs.getInt("montant")));
             }
         }
         return res;
@@ -429,6 +595,27 @@ public class ProjetS5Encheres {
         return id;
     }
 
+    public static void bilan(Connection con) throws SQLException {
+        try ( Statement st = con.createStatement()) {
+            try ( ResultSet tlu = st.executeQuery("select objet.categorie as catégorie,"
+                    + "prixbase,debut as début,fin from Objet")) {
+                System.out.println("Votre bilan");
+                System.out.println("-----------");
+                while (tlu.next()) {
+                    int id = tlu.getInt("id");
+                    String titre = tlu.getString("titre");
+                    Timestamp debut = tlu.getTimestamp("debut");
+                    Timestamp fin = tlu.getTimestamp("fin");
+                    int categorie = tlu.getInt("categorie");
+                    String mess = id + " : " + titre 
+                            + "\n Début de l'enchère : " + debut + "\n Fin de l'enchère : "
+                            + fin + "\n Catégorie : " + categorie;
+                    System.out.println(mess);
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) throws NomExisteDejaException {
         System.out.println("Hello World!");
         try {
@@ -438,10 +625,15 @@ public class ProjetS5Encheres {
 //            System.out.println("schéma créé");
 //            deleteSchema(con);
 //            System.out.println("Schéma supprimé");
-            createUtilisateur(con, "Toto", "truc", "toto@email.fr", "pass1", "67084");
-            System.out.println("Utilisateur créé");
-//            createObjet(con, "Pull", "En laine", 2022-09-05 10:00:00, 2022-09-08 10:00:00, 2000, 2, 3);
-            //afficheTousLesUtilisateurs(con);
+//            createUtilisateur(con, "Toto", "truc", "toto@email.fr", "pass1", "67084");
+//            createUtilisateur2(con);
+//            System.out.println("Utilisateur créé");
+//            createObjet(con, "Pull", "En laine", null, null, 2000, 2, 7);
+//            System.out.println("Objet créé");
+//            createObjet2(con);
+            afficheTousLesUtilisateurs(con);
+//            createCategorie(con);
+//            System.out.println("Catégorie créée");
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ProjetS5Encheres.class
