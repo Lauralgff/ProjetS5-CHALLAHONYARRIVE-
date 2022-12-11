@@ -398,37 +398,79 @@ public class ProjetS5Encheres {
         }
     }
 
-//TODO : finaliser méthode, insérer condition montant supérieur à prixbase
-    public static int createEnchere(Connection con, int de, int sur,
-            Timestamp quand, int montant) throws SQLException {
-        con.setAutoCommit(false);
-        try ( PreparedStatement pst = con.prepareStatement(
-                """
-                insert into enchere1 (de,sur,quand,montant) values (?,?,?,?)
-                """, Statement.RETURN_GENERATED_KEYS)) {
-            System.out.println("Id de l'enchérisseur : ");
-            pst.setInt(1, Lire.i());
-            System.out.println("Id de l'objet : ");
-            pst.setInt(2, Lire.i());
-            pst.setTimestamp(3, convert(GetDate(0)));
-            System.out.println("Montant proposé : ");
-            //if (Lire.i()<=Objet.)
-            pst.setInt(4, Lire.i());
-            pst.executeUpdate();
-            con.commit();
+    public static void demandeEnchere(Connection con) throws SQLException {
+        System.out.println("Id de l'enchérisseur : ");
+        int idE = Lire.i();
+        System.out.println("Id de l'objet : ");
+        int idO = Lire.i();
+        System.out.println("Montant proposé : ");
+        //if (Lire.i()<=Objet.)
+        int montant = Lire.i();
+        int res = createEnchere(con, idE, idO, montant);
+        if (res == -1) {
+            System.out.println("montant trop faible");
+        } else {
+            System.out.println("enchere OK (id :" + res +")");
+        }
 
-            try ( ResultSet rid = pst.getGeneratedKeys()) {
-                rid.next();
-                int id = rid.getInt(1);
-                return id;
+    }
+//TODO : finaliser méthode, insérer condition montant supérieur à prixbase
+
+    public static int createEnchere(Connection con, int de, int sur,
+            int montant) throws SQLException {
+        con.setAutoCommit(false);
+        try {
+            //début de transaction si false
+            String sqlChercheEnchere
+                    = "select max(montant)"
+                    + " from enchere1"
+                    + " where sur = ?";
+            PreparedStatement chercheE = con.prepareStatement(sqlChercheEnchere);
+            chercheE.setInt(1, sur);
+            // statement = ordre sql
+            ResultSet rs1 = chercheE.executeQuery(); //resultSet = table
+            rs1.next();
+            int val = rs1.getInt(1);
+            if (rs1.wasNull()) {
+                String sqlChercheValBase
+                        = "select prixbase"
+                        + " from objet1"
+                        + " where id = ?";
+                PreparedStatement chercheVB = con.prepareStatement(sqlChercheValBase);
+                chercheVB.setInt(1, sur);
+                ResultSet rs2 = chercheVB.executeQuery();
+                rs2.next();
+                val = rs2.getInt("prixbase");
+            }
+            if (montant <= val) {
+                return -1;
+            } else {
+                chercheE.setInt(1, sur);
+                PreparedStatement pst = con.prepareStatement(
+                        """
+                insert into enchere1 (de,sur,quand,montant) values (?,?,?,?)
+                """, Statement.RETURN_GENERATED_KEYS);
+                pst.setInt(1, de);
+                pst.setInt(2, sur);
+                pst.setTimestamp(3, convert(GetDate(0)));
+                pst.setInt(4, montant);
+                pst.executeUpdate();
+                con.commit(); //je valide la transaction
+
+                try ( ResultSet rid = pst.getGeneratedKeys()) {
+                    rid.next();
+                    int id = rid.getInt(1);
+                    return id;
+                }
             }
         } catch (Exception ex) {
-            con.rollback();
+            con.rollback(); //j'annule toute la transaction
             throw ex;
         } finally {
             con.setAutoCommit(true);
         }
     }
+
 
     public static void afficheTousLesUtilisateurs(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
@@ -607,7 +649,7 @@ public class ProjetS5Encheres {
                     Timestamp debut = tlu.getTimestamp("debut");
                     Timestamp fin = tlu.getTimestamp("fin");
                     int categorie = tlu.getInt("categorie");
-                    String mess = id + " : " + titre 
+                    String mess = id + " : " + titre
                             + "\n Début de l'enchère : " + debut + "\n Fin de l'enchère : "
                             + fin + "\n Catégorie : " + categorie;
                     System.out.println(mess);
@@ -631,9 +673,10 @@ public class ProjetS5Encheres {
 //            createObjet(con, "Pull", "En laine", null, null, 2000, 2, 7);
 //            System.out.println("Objet créé");
 //            createObjet2(con);
-            afficheTousLesUtilisateurs(con);
+//            afficheTousLesUtilisateurs(con);
 //            createCategorie(con);
 //            System.out.println("Catégorie créée");
+            demandeEnchere(con);
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ProjetS5Encheres.class
