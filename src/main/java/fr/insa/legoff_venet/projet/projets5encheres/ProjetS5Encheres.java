@@ -18,7 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import fr.insa.legoff_venet.projet.utils.Lire;
 import java.util.Date;
-import java.util.Optional;
 
 /**
  *
@@ -637,44 +636,6 @@ public class ProjetS5Encheres {
         return id;
     }
 
-    public static void bilan(Connection con, int idU) throws SQLException {
-        try ( Statement st = con.createStatement()) {
-            try ( ResultSet tlu = st.executeQuery("select objet1.id,titre,"
-                    + "objet1.categorie,prixbase,debut,fin from objet1")) {
-                try ( ResultSet tlu2 = st.executeQuery("select max(montant) as montantMax,de"
-                        //trouver comment donner automatiquement l'id de 
-                        //l'utilisateur connecté
-                        + "from enchere1"
-                        + "where sur = objet1.id and extists ("
-                        + "select * from enchere1"
-                        + "where de = idU)")) {
-                    System.out.println("Votre bilan");
-                    System.out.println("-----------");
-                    while (tlu.next()) {
-                        while (tlu2.next()) {
-                            int id = tlu.getInt("id");
-                            String titre = tlu.getString("titre");
-                            int prixbase = tlu.getInt("prixbase");
-                            Timestamp debut = tlu.getTimestamp("debut");
-                            Timestamp fin = tlu.getTimestamp("fin");
-                            int categorie = tlu.getInt("categorie");
-                            int montantMax = tlu2.getInt("montantMax");
-                            int de = tlu2.getInt("de");
-                            String mess = id + " : " + titre
-                                    + "\n Catégorie : " + categorie
-                                    + "\n Prix initial : " + prixbase
-                                    + "\n Montant actuel de l'enchère : " + montantMax
-                                    + "\n Dernier enchérisseur : " + de
-                                    + "\n Début de l'enchère : " + debut
-                                    + "\n Fin de l'enchère : " + fin;
-                            System.out.println(mess);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
 //    select objet1.id,objet1.titre, (
 //    select max(montant) from enchere1 where sur = objet1.id
 //) ,
@@ -690,48 +651,52 @@ public class ProjetS5Encheres {
 //    )
 //)
 //from objet1 
-    
-        public static void bilan2(Connection con, int idU) throws SQLException {
+    public static void bilan(Connection con, int idU) throws SQLException {
+//Affiche un message du type : 
+//4 : Bureau
+// Catégorie : 1 / Meuble
+// Prix initial : 10000
+// Montant actuel de l'enchère : 12000
+// Dernier enchérisseur : 7 / Venet
+// Début de l'enchère : 2022-12-08 13:38:38.996
+// Fin de l'enchère : 2022-12-18 13:38:44.405
         try ( Statement st = con.createStatement()) {
             try ( ResultSet tlu = st.executeQuery("select objet1.id,titre,"
-                    + "objet1.categorie,prixbase,debut,fin from objet1")) {
-                    System.out.println("Votre bilan");
-                    System.out.println("-----------");
-                    while (tlu.next()) {
-                try ( ResultSet tlu2 = st.executeQuery("select max(montant) as montantMax"
-                        //trouver comment donner automatiquement l'id de 
-                        //l'utilisateur connecté
-                        + "from enchere1"
-                        + "where sur = objet1.id)")) {
-                    if(tlu2.next()){
-                        int mMax = tlu2.getInt("montantMax");
-                        
-                    }
-                        while (tlu2.next()) {
-                            int id = tlu.getInt("id");
-                            String titre = tlu.getString("titre");
-                            int prixbase = tlu.getInt("prixbase");
-                            Timestamp debut = tlu.getTimestamp("debut");
-                            Timestamp fin = tlu.getTimestamp("fin");
-                            int categorie = tlu.getInt("categorie");
-                            int montantMax = tlu2.getInt("montantMax");
-                            int de = tlu2.getInt("de");
-                            String mess = id + " : " + titre
-                                    + "\n Catégorie : " + categorie
-                                    + "\n Prix initial : " + prixbase
-                                    + "\n Montant actuel de l'enchère : " + montantMax
-                                    + "\n Dernier enchérisseur : " + de
-                                    + "\n Début de l'enchère : " + debut
-                                    + "\n Fin de l'enchère : " + fin;
-                            System.out.println(mess);
-                        }
-                    }
+                    + "(select max(montant) from enchere1 where sur = objet1.id) as mMax,"
+                    + "(select de from enchere1 where sur = objet1.id and montant = ("
+                    + "select max(montant) from enchere1 where sur = objet1.id)) as idDe,"
+                    + "(select utilisateur1.nom from enchere1 "
+                    + "join utilisateur1 on utilisateur1.id = enchere1.de "
+                    + "where sur = objet1.id and montant = ("
+                    + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe,"
+                    + "objet1.categorie,categorie1.nom as nomCat,prixbase,debut,fin from objet1 "
+                    + "join categorie1 on categorie1.id = objet1.categorie")) {
+                System.out.println("Votre bilan");
+                System.out.println("-----------");
+                while (tlu.next()) {
+                    int id = tlu.getInt("id");
+                    String titre = tlu.getString("titre");
+                    int prixbase = tlu.getInt("prixbase");
+                    Timestamp debut = tlu.getTimestamp("debut");
+                    Timestamp fin = tlu.getTimestamp("fin");
+                    int categorie = tlu.getInt("categorie");
+                    String nomCat = tlu.getString("nomCat");
+                    int mMax = tlu.getInt("mMax");
+                    int idDe = tlu.getInt("idDe");
+                    String nomDe = tlu.getString("nomDe");
+                    String mess = id + " : " + titre
+                            + "\n Catégorie : " + categorie + " / " + nomCat
+                            + "\n Prix initial : " + prixbase
+                            + "\n Montant actuel de l'enchère : " + mMax
+                            + "\n Dernier enchérisseur : " + idDe + " / " + nomDe
+                            + "\n Début de l'enchère : " + debut
+                            + "\n Fin de l'enchère : " + fin + "\n";
+                    System.out.println(mess);
                 }
             }
         }
     }
 
-    
 //    public static Optional<Utilisateur> login(Connection con, String nom, String pass)
 //            throws SQLException {
 //        try ( PreparedStatement pst = con.prepareStatement(
@@ -747,7 +712,7 @@ public class ProjetS5Encheres {
 //            }
 //        }
 //    }
-
+    
     public static void main(String[] args) throws NomExisteDejaException {
         System.out.println("Hello World!");
         try {
