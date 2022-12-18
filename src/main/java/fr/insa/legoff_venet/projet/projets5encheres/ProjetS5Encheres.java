@@ -18,6 +18,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import fr.insa.legoff_venet.projet.utils.Lire;
 import java.util.Date;
+import java.util.Optional;
+import fr.insa.legoff_venet.Session.Session;
 
 /**
  *
@@ -117,22 +119,12 @@ public class ProjetS5Encheres {
                         add constraint fk_enchere1_sur
                         foreign key (sur) references objet1(id)
                     """);
-            // si j'arrive jusqu'ici, c'est que tout s'est bien passÃ©
-            // je confirme (commit) la transaction
             con.commit();
-            // je retourne dans le mode par dÃ©faut de gestion des transaction :
-            // chaque ordre au SGBD sera considÃ©rÃ© comme une transaction indÃ©pendante
             con.setAutoCommit(true);
         } catch (SQLException ex) {
-            // quelque chose s'est mal passÃ©
-            // j'annule la transaction
             con.rollback();
-            // puis je renvoie l'exeption pour qu'elle puisse Ã©ventuellement
-            // Ãªtre gÃ©rÃ©e (message Ã  l'utilisateur...)
             throw ex;
         } finally {
-            // je reviens Ã  la gestion par dÃ©faut : une transaction pour
-            // chaque ordre SQL
             con.setAutoCommit(true);
         }
     }
@@ -290,6 +282,24 @@ public class ProjetS5Encheres {
             con.setAutoCommit(true);
         }
     }
+    
+//    public static void demandeUtilisateur(Connection con) throws SQLException {
+//        boolean existe = true;
+//        while (existe) {
+//            System.out.println("Nouvel utilisateur");
+//            String nom = Console.entreeString("nom");
+//            String prenom = Console.entreeString("prenom");
+//            String email = Console.entreeString("email");
+//            String pass = Console.entreeString("pass");
+//            String codepostal = Console.entreeString("codepostal");
+//            try {
+//                createUtilisateur(con, nom, prenom, email, pass, codepostal);
+//                existe = false;
+//            } catch (NomExisteDejaException ex) {
+//                System.out.println("Ce nom d'utilisateur existe déjà.");
+//            }
+//        }
+//    }
 
     public static Date GetDate(int nbjr) {
         long milliseconds = System.currentTimeMillis();
@@ -325,8 +335,7 @@ public class ProjetS5Encheres {
             con.setAutoCommit(true);
         }
     }
-//TODO : régler le pb des Timestamp
-//      permettre de créer un objet "spontanément" 
+//TODO : permettre de créer un objet "spontanément" 
 
     public static int createObjet(Connection con, String titre, String description,
             Timestamp debut, Timestamp fin, int prixbase, int categorie, int proposepar)
@@ -401,6 +410,7 @@ public class ProjetS5Encheres {
     public static void demandeEnchere(Connection con) throws SQLException {
         System.out.println("Id de l'enchérisseur : ");
         int idE = Lire.i();
+//        int idE = Session.getUserId();
         System.out.println("Id de l'objet : ");
         int idO = Lire.i();
         System.out.println("Montant proposé : ");
@@ -428,7 +438,8 @@ public class ProjetS5Encheres {
             PreparedStatement chercheE = con.prepareStatement(sqlChercheEnchere);
             chercheE.setInt(1, sur);
             // statement = ordre sql
-            ResultSet rs1 = chercheE.executeQuery(); //resultSet = table
+            ResultSet rs1 = chercheE.executeQuery(); 
+            //resultSet = table
             rs1.next();
             int val = rs1.getInt(1);
             if (rs1.wasNull()) {
@@ -697,22 +708,25 @@ public class ProjetS5Encheres {
         }
     }
 
-//    public static Optional<Utilisateur> login(Connection con, String nom, String pass)
-//            throws SQLException {
-//        try ( PreparedStatement pst = con.prepareStatement(
-//                "select utilisateur1.id as uid from utilisateur1"
-//                + "where utilisateur1.nom = ? and pass = ?")) {
-//            pst.setString(1, nom);
-//            pst.setString(2, pass);
-//            ResultSet res = pst.executeQuery();
-//            if (res.next()) {
-//                return Optional.of(new Utilisateur(res.getInt("uid"), nom, pass));
-//            } else {
-//                return Optional.empty();
-//            }
-//        }
-//    }
-    
+    public static Optional<Utilisateur> login(Connection con, String email, String pass)
+            throws SQLException {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select utilisateur1.id as uid,nom,prenom,codepostal from utilisateur1 "
+                + "where utilisateur1.email = ? and pass = ?")) {
+            pst.setString(1, email);
+            pst.setString(2, pass);
+            ResultSet res = pst.executeQuery();
+            if (res.next()) {
+                return Optional.of(new Utilisateur(res.getInt("uid"),
+                        res.getString("nom"), res.getString("prenom"),
+                        email, pass, res.getString("codepostal")));
+            } else {
+//                System.out.println("Mauvais identifiant ou mot de passe");
+                return Optional.empty();
+            }
+        }
+    }
+
     public static void main(String[] args) throws NomExisteDejaException {
         System.out.println("Hello World!");
         try {
@@ -728,11 +742,13 @@ public class ProjetS5Encheres {
 //            createObjet(con, "Pull", "En laine", null, null, 2000, 2, 7);
 //            System.out.println("Objet créé");
 //            createObjet2(con);
-//            afficheTousLesUtilisateurs(con);
+            afficheTousLesUtilisateurs(con);
 //            createCategorie(con);
 //            System.out.println("Catégorie créée");
 //            demandeEnchere(con);
-            bilan(con, 7);
+//            bilan(con, 7);
+//            login(con, "yoann@email.com", "pass1");
+//            System.out.println("Utilisateur connecté");
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ProjetS5Encheres.class
