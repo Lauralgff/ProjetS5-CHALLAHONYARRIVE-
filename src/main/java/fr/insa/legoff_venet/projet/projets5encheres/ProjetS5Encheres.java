@@ -204,18 +204,21 @@ public class ProjetS5Encheres {
 
     public static class NomExisteDejaException extends Exception {
     }
+    
+    public static class EmailExisteDejaException extends Exception {
+    }
 
     public static int createUtilisateur(Connection con, String nom, String prenom,
             String email, String pass, String codepostal)
-            throws SQLException {
+            throws SQLException, EmailExisteDejaException {
         con.setAutoCommit(false);
-        try ( PreparedStatement chercheNom = con.prepareStatement(
-                "select id from utilisateur1 where nom = ?")) {
-            chercheNom.setString(1, nom);
-            ResultSet testNom = chercheNom.executeQuery();
-//            if (testNom.next()) {
-//                throw new NomExisteDejaException();
-//            }
+        try ( PreparedStatement chercheEmail = con.prepareStatement(
+                "select id from utilisateur1 where email = ?")) {
+            chercheEmail.setString(1, nom);
+            ResultSet testEmail = chercheEmail.executeQuery();
+            if (testEmail.next()) {
+                throw new EmailExisteDejaException();
+            }
             try ( PreparedStatement pst = con.prepareStatement(
                     """
                     insert into utilisateur1 (nom,prenom,email,pass,codepostal) values (?,?,?,?,?) 
@@ -283,23 +286,23 @@ public class ProjetS5Encheres {
         }
     }
     
-//    public static void demandeUtilisateur(Connection con) throws SQLException {
-//        boolean existe = true;
-//        while (existe) {
-//            System.out.println("Nouvel utilisateur");
-//            String nom = Console.entreeString("nom");
-//            String prenom = Console.entreeString("prenom");
-//            String email = Console.entreeString("email");
-//            String pass = Console.entreeString("pass");
-//            String codepostal = Console.entreeString("codepostal");
-//            try {
-//                createUtilisateur(con, nom, prenom, email, pass, codepostal);
-//                existe = false;
-//            } catch (NomExisteDejaException ex) {
-//                System.out.println("Ce nom d'utilisateur existe déjà.");
-//            }
-//        }
-//    }
+    public static void demandeUtilisateur(Connection con) throws SQLException {
+        boolean existe = true;
+        while (existe) {
+            System.out.println("Nouvel utilisateur");
+            String nom = Console.entreeString("nom");
+            String prenom = Console.entreeString("prenom");
+            String email = Console.entreeString("email");
+            String pass = Console.entreeString("pass");
+            String codepostal = Console.entreeString("codepostal");
+            try {
+                createUtilisateur(con, nom, prenom, email, pass, codepostal);
+                existe = false;
+            } catch (EmailExisteDejaException ex) {
+                System.out.println("Ce nom d'utilisateur existe déjà.");
+            }
+        }
+    }
 
     public static Date GetDate(int nbjr) {
         long milliseconds = System.currentTimeMillis();
@@ -310,6 +313,14 @@ public class ProjetS5Encheres {
 
     public static java.sql.Timestamp convert(java.util.Date date) {
         return new java.sql.Timestamp(date.getTime());
+    }
+    
+// Format texte d'un Timestamp : 2022-12-28 21:52:29.92
+    public static void testDate(){
+        long millis = System.currentTimeMillis();
+        Date date = new Date(millis);
+        Timestamp ts = convert(date);
+        System.out.println(ts);
     }
 
     public static int createCategorie(Connection con) throws SQLException {
@@ -417,8 +428,12 @@ public class ProjetS5Encheres {
         int montant = Lire.i();
         int res = createEnchere(con, idE, idO, montant);
         if (res == -1) {
-            System.out.println("montant trop faible");
-        } else {
+            System.out.println("Le montant de votre enchère est trop faible");
+        } 
+//        else if (res == -2) {
+//            System.out.println("La vente est terminée, vous ne pouvez plus proposer d'enchère.9");
+//        } 
+        else {
             System.out.println("Votre enchère a bien été enregistrée. (id :" + res + ")");
         }
 
@@ -455,7 +470,19 @@ public class ProjetS5Encheres {
             }
             if (montant <= val) {
                 return -1;
-            } else {
+            } 
+            else {
+//                String sqlDateFin
+//                        = "select fin from objet1 "
+//                        + "where id = ?";
+//                PreparedStatement chercheDateFin = con.prepareStatement(sqlDateFin);
+//                chercheDateFin.setInt(1, sur);
+//                ResultSet rs3 = chercheDateFin.executeQuery();
+//                Timestamp fin = rs3.getTimestamp("fin");
+//                if (fin.getTime() <= System.currentTimeMillis()){
+//                    return -2;
+//                } else {
+                
                 chercheE.setInt(1, sur);
                 PreparedStatement pst = con.prepareStatement(
                         """
@@ -473,6 +500,7 @@ public class ProjetS5Encheres {
                     int id = rid.getInt(1);
                     return id;
                 }
+//            }
             }
         } catch (Exception ex) {
             con.rollback(); //j'annule toute la transaction
@@ -481,6 +509,8 @@ public class ProjetS5Encheres {
             con.setAutoCommit(true);
         }
     }
+    
+    
 
     public static void afficheTousLesUtilisateurs(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
@@ -726,6 +756,35 @@ public class ProjetS5Encheres {
             }
         }
     }
+    
+    public static void menuPrincipal(Connection con) {
+        int rep = -1;
+        while (rep != 0) {
+            System.out.println("1) Liste des utilisateurs \n"
+                    + "2) Proposer un objet \n"
+                    + "3) Proposer une enchère \n"
+                    + "4) Liste des objets \n"
+                    + "0) Quitter");
+            rep = Console.entreeEntier("Votre choix : ");
+            try {
+                if (rep == 1){
+                    afficheTousLesUtilisateurs(con);
+                } else if (rep == 2){
+                    createObjet2(con);
+                } else if (rep == 3){
+                    demandeEnchere(con);
+                } else if (rep == 4){
+                    afficheTousLesObjets(con);
+                }
+            } catch (SQLException ex){
+                System.out.println("Problème : ...");
+            }
+        }
+    }
+    
+    public static void menuObjet(Connection con){
+        
+    }
 
     public static void main(String[] args) throws NomExisteDejaException {
         System.out.println("Hello World!");
@@ -742,10 +801,10 @@ public class ProjetS5Encheres {
 //            createObjet(con, "Pull", "En laine", null, null, 2000, 2, 7);
 //            System.out.println("Objet créé");
 //            createObjet2(con);
-            afficheTousLesUtilisateurs(con);
+//            afficheTousLesUtilisateurs(con);
 //            createCategorie(con);
 //            System.out.println("Catégorie créée");
-//            demandeEnchere(con);
+            demandeEnchere(con);
 //            bilan(con, 7);
 //            login(con, "yoann@email.com", "pass1");
 //            System.out.println("Utilisateur connecté");
