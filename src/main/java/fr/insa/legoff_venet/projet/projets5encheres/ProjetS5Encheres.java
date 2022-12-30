@@ -20,6 +20,7 @@ import fr.insa.legoff_venet.projet.utils.Lire;
 import java.util.Date;
 import java.util.Optional;
 import fr.insa.legoff_venet.Session.Session;
+import fr.insa.legoff_venet.projet.utils.Console;
 
 /**
  *
@@ -204,7 +205,7 @@ public class ProjetS5Encheres {
 
     public static class NomExisteDejaException extends Exception {
     }
-    
+
     public static class EmailExisteDejaException extends Exception {
     }
 
@@ -285,7 +286,7 @@ public class ProjetS5Encheres {
             con.setAutoCommit(true);
         }
     }
-    
+
     public static void demandeUtilisateur(Connection con) throws SQLException {
         boolean existe = true;
         while (existe) {
@@ -314,9 +315,9 @@ public class ProjetS5Encheres {
     public static java.sql.Timestamp convert(java.util.Date date) {
         return new java.sql.Timestamp(date.getTime());
     }
-    
+
 // Format texte d'un Timestamp : 2022-12-28 21:52:29.92
-    public static void testDate(){
+    public static void testDate() {
         long millis = System.currentTimeMillis();
         Date date = new Date(millis);
         Timestamp ts = convert(date);
@@ -429,10 +430,9 @@ public class ProjetS5Encheres {
         int res = createEnchere(con, idE, idO, montant);
         if (res == -1) {
             System.out.println("Le montant de votre enchère est trop faible");
-        } 
-//        else if (res == -2) {
-//            System.out.println("La vente est terminée, vous ne pouvez plus proposer d'enchère.9");
-//        } 
+        } //        else if (res == -2) {
+        //            System.out.println("La vente est terminée, vous ne pouvez plus proposer d'enchère.9");
+        //        } 
         else {
             System.out.println("Votre enchère a bien été enregistrée. (id :" + res + ")");
         }
@@ -453,7 +453,7 @@ public class ProjetS5Encheres {
             PreparedStatement chercheE = con.prepareStatement(sqlChercheEnchere);
             chercheE.setInt(1, sur);
             // statement = ordre sql
-            ResultSet rs1 = chercheE.executeQuery(); 
+            ResultSet rs1 = chercheE.executeQuery();
             //resultSet = table
             rs1.next();
             int val = rs1.getInt(1);
@@ -470,8 +470,7 @@ public class ProjetS5Encheres {
             }
             if (montant <= val) {
                 return -1;
-            } 
-            else {
+            } else {
 //                String sqlDateFin
 //                        = "select fin from objet1 "
 //                        + "where id = ?";
@@ -482,7 +481,7 @@ public class ProjetS5Encheres {
 //                if (fin.getTime() <= System.currentTimeMillis()){
 //                    return -2;
 //                } else {
-                
+
                 chercheE.setInt(1, sur);
                 PreparedStatement pst = con.prepareStatement(
                         """
@@ -509,8 +508,6 @@ public class ProjetS5Encheres {
             con.setAutoCommit(true);
         }
     }
-    
-    
 
     public static void afficheTousLesUtilisateurs(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
@@ -738,6 +735,59 @@ public class ProjetS5Encheres {
         }
     }
 
+    public static void recherche(Connection con) throws SQLException {
+        String search = Console.entreeString("Veuillez entrer votre recherche.");
+        String finalSearch = "%" + search + "%";
+        try ( PreparedStatement pst = con.prepareStatement("select * from objet1 "
+                + "where titre like ?")) {
+            pst.setString(1, finalSearch);
+            try ( ResultSet tlu = pst.executeQuery()) {
+                System.out.println("Résultats obtenus : \n"
+                        + "--------------------");
+                while (tlu.next()) {
+                    int id = tlu.getInt("id");
+                    String titre = tlu.getString("titre");
+                    String description = tlu.getString("description");
+                    Timestamp debut = tlu.getTimestamp("debut");
+                    Timestamp fin = tlu.getTimestamp("fin");
+                    int prixbase = tlu.getInt("prixbase");
+                    int proposepar = tlu.getInt("proposepar");
+                    int categorie = tlu.getInt("categorie");
+                    String mess = id + " : " + titre + " \n" + description
+                            + "\nEnchère : du " + debut + " au " + fin + "\n"
+                            + "Prix de base : " + prixbase + "\n"
+                            + "Catégorie : " + categorie + " / Vendeur : " + proposepar;
+
+                    System.out.println(mess);
+                }
+            }
+        }
+        try ( PreparedStatement pst = con.prepareStatement("select * from objet1 "
+                + "where description like ?")) {
+            pst.setString(1, finalSearch);
+            try ( ResultSet tlu = pst.executeQuery()) {
+                System.out.println("Résultats obtenus : \n"
+                        + "--------------------");
+                while (tlu.next()) {
+                    int id = tlu.getInt("id");
+                    String titre = tlu.getString("titre");
+                    String description = tlu.getString("description");
+                    Timestamp debut = tlu.getTimestamp("debut");
+                    Timestamp fin = tlu.getTimestamp("fin");
+                    int prixbase = tlu.getInt("prixbase");
+                    int proposepar = tlu.getInt("proposepar");
+                    int categorie = tlu.getInt("categorie");
+                    String mess = id + " : " + titre + " \n" + description
+                            + "\nEnchère : du " + debut + " au " + fin + "\n"
+                            + "Prix de base : " + prixbase + "\n"
+                            + "Catégorie : " + categorie + " / Vendeur : " + proposepar;
+
+                    System.out.println(mess);
+                }
+            }
+        }
+    }
+
     public static Optional<Utilisateur> login(Connection con, String email, String pass)
             throws SQLException {
         try ( PreparedStatement pst = con.prepareStatement(
@@ -751,12 +801,12 @@ public class ProjetS5Encheres {
                         res.getString("nom"), res.getString("prenom"),
                         email, pass, res.getString("codepostal")));
             } else {
-//                System.out.println("Mauvais identifiant ou mot de passe");
+                System.out.println("Mauvais identifiant ou mot de passe");
                 return Optional.empty();
             }
         }
     }
-    
+
     public static void menuPrincipal(Connection con) {
         int rep = -1;
         while (rep != 0) {
@@ -767,23 +817,23 @@ public class ProjetS5Encheres {
                     + "0) Quitter");
             rep = Console.entreeEntier("Votre choix : ");
             try {
-                if (rep == 1){
+                if (rep == 1) {
                     afficheTousLesUtilisateurs(con);
-                } else if (rep == 2){
+                } else if (rep == 2) {
                     createObjet2(con);
-                } else if (rep == 3){
+                } else if (rep == 3) {
                     demandeEnchere(con);
-                } else if (rep == 4){
+                } else if (rep == 4) {
                     afficheTousLesObjets(con);
                 }
-            } catch (SQLException ex){
+            } catch (SQLException ex) {
                 System.out.println("Problème : ...");
             }
         }
     }
-    
-    public static void menuObjet(Connection con){
-        
+
+    public static void menuObjet(Connection con) {
+
     }
 
     public static void main(String[] args) throws NomExisteDejaException {
@@ -804,8 +854,9 @@ public class ProjetS5Encheres {
 //            afficheTousLesUtilisateurs(con);
 //            createCategorie(con);
 //            System.out.println("Catégorie créée");
-            demandeEnchere(con);
+//            demandeEnchere(con);
 //            bilan(con, 7);
+            recherche(con);
 //            login(con, "yoann@email.com", "pass1");
 //            System.out.println("Utilisateur connecté");
 
