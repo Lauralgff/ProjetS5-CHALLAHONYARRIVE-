@@ -738,12 +738,20 @@ public class ProjetS5Encheres {
     public static void recherche(Connection con) throws SQLException {
         String search = Console.entreeString("Veuillez entrer votre recherche.");
         String finalSearch = "%" + search + "%";
-        try ( PreparedStatement pst = con.prepareStatement("select * from objet1 "
-                + "where titre like ?")) {
+        try ( PreparedStatement pst = con.prepareStatement("select *,"
+                + "(select max(montant) from enchere1 where sur = objet1.id) as mMax,"
+                + "categorie1.nom as nomCat,"
+                + "(select utilisateur1.nom from enchere1 "
+                    + "join utilisateur1 on utilisateur1.id = enchere1.de "
+                    + "where sur = objet1.id and montant = ("
+                    + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe "
+                + "from objet1 "
+                + "join categorie1 on categorie1.id = objet1.categorie "
+                + "where titre like ? ")) {
             pst.setString(1, finalSearch);
             try ( ResultSet tlu = pst.executeQuery()) {
-                System.out.println("Résultats obtenus : \n"
-                        + "--------------------");
+//                System.out.println("Résultats obtenus : \n"
+//                        + "--------------------");
                 while (tlu.next()) {
                     int id = tlu.getInt("id");
                     String titre = tlu.getString("titre");
@@ -751,23 +759,40 @@ public class ProjetS5Encheres {
                     Timestamp debut = tlu.getTimestamp("debut");
                     Timestamp fin = tlu.getTimestamp("fin");
                     int prixbase = tlu.getInt("prixbase");
+                    int mMax = tlu.getInt("mMax");
+                    if (mMax == 0){
+                        mMax = prixbase;
+                    }
                     int proposepar = tlu.getInt("proposepar");
                     int categorie = tlu.getInt("categorie");
+                    String nomCat = tlu.getString("nomCat");
+                    String nomDe = tlu.getString("nomDe");
                     String mess = id + " : " + titre + " \n" + description
                             + "\nEnchère : du " + debut + " au " + fin + "\n"
-                            + "Prix de base : " + prixbase + "\n"
-                            + "Catégorie : " + categorie + " / Vendeur : " + proposepar;
+                            + "Prix de base : " + prixbase + " / Prix actuel : " 
+                            + mMax + "\n"
+                            + "Catégorie : " + categorie + " / " + nomCat 
+                            + "\nVendeur : " + proposepar + " / " + nomDe 
+                            + "\n--------------------";
 
                     System.out.println(mess);
                 }
             }
         }
-        try ( PreparedStatement pst = con.prepareStatement("select * from objet1 "
+        try ( PreparedStatement pst = con.prepareStatement("select *,"
+                + "(select max(montant) from enchere1 where sur = objet1.id) as mMax,"
+                + "categorie1.nom as nomCat,"
+                + "(select utilisateur1.nom from enchere1 "
+                    + "join utilisateur1 on utilisateur1.id = enchere1.de "
+                    + "where sur = objet1.id and montant = ("
+                    + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe "
+                + "from objet1 "
+                + "join categorie1 on categorie1.id = objet1.categorie "
                 + "where description like ?")) {
             pst.setString(1, finalSearch);
             try ( ResultSet tlu = pst.executeQuery()) {
-                System.out.println("Résultats obtenus : \n"
-                        + "--------------------");
+//                System.out.println("Résultats obtenus : \n"
+//                        + "--------------------");
                 while (tlu.next()) {
                     int id = tlu.getInt("id");
                     String titre = tlu.getString("titre");
@@ -775,12 +800,21 @@ public class ProjetS5Encheres {
                     Timestamp debut = tlu.getTimestamp("debut");
                     Timestamp fin = tlu.getTimestamp("fin");
                     int prixbase = tlu.getInt("prixbase");
+                    int mMax = tlu.getInt("mMax");
+                    if (mMax == 0){
+                        mMax = prixbase;
+                    }
                     int proposepar = tlu.getInt("proposepar");
                     int categorie = tlu.getInt("categorie");
+                    String nomCat = tlu.getString("nomCat");
+                    String nomDe = tlu.getString("nomDe");
                     String mess = id + " : " + titre + " \n" + description
                             + "\nEnchère : du " + debut + " au " + fin + "\n"
-                            + "Prix de base : " + prixbase + "\n"
-                            + "Catégorie : " + categorie + " / Vendeur : " + proposepar;
+                            + "Prix de base : " + prixbase + " / Prix actuel : " 
+                            + mMax + "\n"
+                            + "Catégorie : " + categorie + " / " + nomCat 
+                            + "\nVendeur : " + proposepar + " / " + nomDe 
+                            + "\n--------------------";
 
                     System.out.println(mess);
                 }
