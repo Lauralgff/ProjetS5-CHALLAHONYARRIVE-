@@ -4,7 +4,6 @@
  */
 package fr.insa.legoff_venet.projet.projets5encheres;
 
-import fr.insa.legoff_venet.projet.utils.Console;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -420,19 +419,23 @@ public class ProjetS5Encheres {
     }
 
     public static void demandeEnchere(Connection con) throws SQLException {
-        System.out.println("Id de l'enchérisseur : ");
-        int idE = Lire.i();
-//        int idE = Session.getUserId();
-        System.out.println("Id de l'objet : ");
-        int idO = Lire.i();
-        System.out.println("Montant proposé : ");
-        int montant = Lire.i();
-        int res = createEnchere(con, idE, idO, montant);
+//        System.out.println("Id de l'enchérisseur : ");
+//        int idE = Lire.i();
+////        int idE = Session.getUserId();
+//        System.out.println("Id de l'objet : ");
+//        int idO = Lire.i();
+//        System.out.println("Montant proposé : ");
+//        int montant = Lire.i();
+        int res = createEnchere(con, 
+                Console.entreeEntier("Id de l'enchérisseur : "), 
+                Console.entreeEntier("Id de l'objet : "), 
+                Console.entreeEntier("Montant proposé"));
         if (res == -1) {
             System.out.println("Le montant de votre enchère est trop faible");
-        } //        else if (res == -2) {
-        //            System.out.println("La vente est terminée, vous ne pouvez plus proposer d'enchère.9");
-        //        } 
+        } 
+                else if (res == -2) {
+            System.out.println("La vente est terminée, vous ne pouvez plus proposer d'enchère.9");
+        }
         else {
             System.out.println("Votre enchère a bien été enregistrée. (id :" + res + ")");
         }
@@ -893,7 +896,28 @@ public class ProjetS5Encheres {
         }
     }
 
-    public static Optional<Utilisateur> login(Connection con, String email, String pass)
+    public static Optional<Utilisateur> login(Connection con)
+            throws SQLException {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select utilisateur1.id as uid,nom,prenom,codepostal from utilisateur1 "
+                + "where utilisateur1.email = ? and pass = ?")) {
+            String email = Console.entreeString("Identifiant");
+            String pass = Console.entreeString("Mot de passe");
+            pst.setString(1, email);
+            pst.setString(2, pass);
+            ResultSet res = pst.executeQuery();
+            if (res.next()) {
+                return Optional.of(new Utilisateur(res.getInt("uid"),
+                        res.getString("nom"), res.getString("prenom"),
+                        email, pass, res.getString("codepostal")));
+            } else {
+                System.out.println("Mauvais identifiant ou mot de passe");
+                return Optional.empty();
+            }
+        }
+    }
+    
+    public static Optional<Utilisateur> login2(Connection con, String email, String pass)
             throws SQLException {
         try ( PreparedStatement pst = con.prepareStatement(
                 "select utilisateur1.id as uid,nom,prenom,codepostal from utilisateur1 "
@@ -911,9 +935,21 @@ public class ProjetS5Encheres {
             }
         }
     }
+    
+    public static void inscription(Connection con)
+            throws SQLException, EmailExisteDejaException {
+        String nom = Console.entreeString("Nom : ");
+        String prenom = Console.entreeString("Prénom : ");
+        String email = Console.entreeString("email : ");
+        String pass = Console.entreeString("Mot de passe : ");
+        String codepostal = Console.entreeString("Code postal : ");
+        createUtilisateur(con, nom, prenom, email, pass, codepostal);
+        login2(con,email,pass);
+    }
 
     public static void menuPrincipal(Connection con) {
         int rep = -1;
+//        Session curSec = new Session();
         while (rep != 0) {
             System.out.println("1) Liste des utilisateurs \n"
                     + "2) Proposer un objet \n"
@@ -932,11 +968,32 @@ public class ProjetS5Encheres {
                 } else if (rep == 4) {
                     afficheTousLesObjets(con);
                 } else if (rep == 5) {
+//                    Utilisateur curUser = curSec.getCurrentUser().orElseThrow();
                     bilanFinal(con);
                 }
             } catch (SQLException ex) {
                 System.out.println("Problème : ...");
             }
+        }
+    }
+    
+    public static void menuLogin() {
+        Connection con = null;
+        Session curSec = new Session();
+        boolean ok = false;
+        try {
+            con = defautConnect();
+            while (login(con).isEmpty()){
+                login(con);
+            }
+            System.out.println("Connecté");
+            
+            ok = true;
+        } catch (SQLException | ClassNotFoundException ex) {
+            System.out.println("Problem : " + ex.getLocalizedMessage());
+        }
+        if (ok) {
+            menuPrincipal(con);
         }
     }
 
@@ -965,10 +1022,11 @@ public class ProjetS5Encheres {
 //            demandeEnchere(con);
 //            bilanFinal(con);
 //            recherche(con);
-//            login(con, "yoann@email.com", "pass1");
+//            login(con);
 //            System.out.println("Utilisateur connecté");
 //            demandeUtilisateur(con);
-            menuPrincipal(con);
+//            menuPrincipal(con);
+            menuLogin();
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ProjetS5Encheres.class
