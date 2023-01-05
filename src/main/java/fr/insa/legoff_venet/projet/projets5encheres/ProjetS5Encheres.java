@@ -945,6 +945,25 @@ public class ProjetS5Encheres {
         String codepostal = Console.entreeString("Code postal : ");
         createUtilisateur(con, nom, prenom, email, pass, codepostal);
         login2(con,email,pass);
+        System.out.println("Nouvel utilisateur inscrit");
+    }
+    
+    public static void toutRecreer(Connection con) throws SQLException {
+        try {
+            deleteSchema(con);
+        } catch (SQLException ex) {
+            System.out.println("Pas de suppression nécessaire");
+        }
+        creeSchema(con);
+        List<Integer> idu = new ArrayList<>();
+        try {
+            idu.add(createUtilisateur(con, "Cabane", "La", 
+                    "lacabane@email.com", "lctcqtv", "67000"));
+            idu.add(createUtilisateur(con, "Leblanc", "Juste",
+                    "justelb@email.com", "ilapasdeprenom", "75000"));
+        } catch (EmailExisteDejaException ex) {
+            throw new Error(ex);
+        }
     }
 
     public static void menuPrincipal(Connection con) {
