@@ -42,7 +42,7 @@ public class ProjetS5Encheres {
 
     public static Connection defautConnect()
             throws ClassNotFoundException, SQLException {
-        return connectGeneralPostGres("localhost", 5439, "postgres", "postgres", "pass");
+        return connectGeneralPostGres("localhost", 5432, "postgres", "postgres", "pass");
     }
 
     public static void creeSchema(Connection con)
@@ -442,18 +442,43 @@ public class ProjetS5Encheres {
 
     public static void demandeEnchere(Connection con) throws SQLException {
 //        int idE = Session.getUserId();
-        int res = createEnchere(con,
-                Console.entreeEntier("Id de l'enchérisseur : "),
-                Console.entreeEntier("Id de l'objet : "),
-                Console.entreeEntier("Montant proposé"));
+        int idEncherisseur = Console.entreeEntier("Id de l'enchérisseur : ");
+        int idObj = Console.entreeEntier("Id de l'objet : ");
+        int montant = Console.entreeEntier("Montant proposé");
+        int res = 0;
+        if (finiOuPas(con, idObj) == false) {
+            res = -2;
+        } else {
+            res = createEnchere(con, idEncherisseur, idObj,montant);
+        }
         if (res == -1) {
             System.out.println("Le montant de votre enchère est trop faible");
         } else if (res == -2) {
-            System.out.println("La vente est terminée, vous ne pouvez plus proposer d'enchère.9");
+            System.out.println("La vente est terminée, vous ne pouvez plus proposer d'enchère.");
         } else {
             System.out.println("Votre enchère a bien été enregistrée. (id :" + res + ")");
         }
 
+    }
+    
+    public static boolean finiOuPas(Connection con, int idObj) throws SQLException {
+        boolean enCours = true;
+        con.setAutoCommit(false);
+        try {
+            String sqlChercheFin 
+                    = "select fin from objet1 where id = ?";
+            PreparedStatement chercheF = con.prepareStatement(sqlChercheFin);
+            chercheF.setInt(1, idObj);
+            ResultSet rs = chercheF.executeQuery();
+            rs.next();
+            Timestamp fin = rs.getTimestamp(1);
+            if (fin.getTime() <= System.currentTimeMillis()) {
+                enCours = false;
+            }
+        } catch (SQLException ex) {
+            System.out.println("Problème finiOuPas");
+        }
+        return enCours;
     }
     
 //TODO : finaliser méthode, paramétrage de "de" et "sur" en fonction de 
@@ -1061,17 +1086,29 @@ public class ProjetS5Encheres {
         createCategorie2(con, "Sport");
         createCategorie2(con, "Jeux/Jouets");
         createCategorie2(con, "Automobile");
+        createCategorie2(con, "Bricolage");
+        
+        Timestamp ts = new Timestamp(0, 0, 0, 0, 0, 0, 0);
 
         createObjet(con, "Pull", "En laine",
-                convert(GetDate(-10)), convert(GetDate(-2)), 2000, 2, 1);
+                convert(GetDate(-10)), convert(GetDate(-2)), 
+                2000, 2, 1);
         createObjet(con, "Bureau", "En bois avec quatre pieds",
-                convert(GetDate(-30)), convert(GetDate(5)), 10000, 1, 1);
+                convert(GetDate(-30)), convert(GetDate(5)), 
+                10000, 1, 1);
         createObjet(con, "Cage à oiseaux", "En métal avec un perchoir",
-                convert(GetDate(-5)), convert(GetDate(15)), 5000, 3, 3);
+                convert(GetDate(-5)), convert(GetDate(15)), 
+                5000, 3, 3);
         createObjet(con, "Un truc", "sans enchère pour faire des tests",
-                convert(GetDate(-30)), convert(GetDate(30)), 100, 1, 2);
+                convert(GetDate(-30)), convert(GetDate(30)), 
+                100, 1, 2);
         createObjet(con, "Pneus", "4 pneus neige peu utilisés",
-                convert(GetDate(-30)), convert(GetDate(-2)), 20000, 6, 4);
+                convert(GetDate(-30)), convert(GetDate(-2)), 
+                20000, 6, 4);
+        createObjet(con, "test ts", "test", 
+                new Timestamp(2022, 12, 18, 12, 0, 0, 0), 
+                new Timestamp(2023, 01, 18, 12, 0, 0, 0), 
+                100, 5, 4);
 
         createEnchere2(con, 2, 2, convert(GetDate(-15)), 11000);
         createEnchere2(con, 4, 2, convert(GetDate(-5)), 12000);
@@ -1157,14 +1194,14 @@ public class ProjetS5Encheres {
 //            afficheTousLesUtilisateurs(con);
 //            createCategorie(con);
 //            System.out.println("Catégorie créée");
-//            demandeEnchere(con);
+            demandeEnchere(con);
 //            bilanFinal(con);
 //            recherche(con);
 //            login(con);
 //            System.out.println("Utilisateur connecté");
 //            demandeUtilisateur(con);
 //            menuPrincipal(con);
-            toutRecreer(con);
+//            toutRecreer(con);
 //            menuLogin();
 
         } catch (ClassNotFoundException ex) {
