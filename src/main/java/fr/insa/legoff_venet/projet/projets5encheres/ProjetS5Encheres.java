@@ -449,7 +449,7 @@ public class ProjetS5Encheres {
         if (finiOuPas(con, idObj) == false) {
             res = -2;
         } else {
-            res = createEnchere(con, idEncherisseur, idObj,montant);
+            res = createEnchere(con, idEncherisseur, idObj, montant);
         }
         if (res == -1) {
             System.out.println("Le montant de votre enchère est trop faible");
@@ -460,12 +460,12 @@ public class ProjetS5Encheres {
         }
 
     }
-    
+
     public static boolean finiOuPas(Connection con, int idObj) throws SQLException {
         boolean enCours = true;
         con.setAutoCommit(false);
         try {
-            String sqlChercheFin 
+            String sqlChercheFin
                     = "select fin from objet1 where id = ?";
             PreparedStatement chercheF = con.prepareStatement(sqlChercheFin);
             chercheF.setInt(1, idObj);
@@ -480,10 +480,9 @@ public class ProjetS5Encheres {
         }
         return enCours;
     }
-    
+
 //TODO : finaliser méthode, paramétrage de "de" et "sur" en fonction de 
     //   l'utilisateur connecté et de l'objet choisi
-
     public static int createEnchere(Connection con, int de, int sur,
             int montant) throws SQLException {
         con.setAutoCommit(false);
@@ -511,7 +510,7 @@ public class ProjetS5Encheres {
                 rs2.next();
                 val = rs2.getInt("prixbase");
             }
-            if (montant <= val) {
+            if (montant < val) {
                 return -1;
             } else {
 //                String sqlDateFin
@@ -855,15 +854,19 @@ public class ProjetS5Encheres {
         }
     }
 
-//BilanFinal affiche un message du type : 
-//4 : Bureau
-// Catégorie : 1 / Meuble
-// Prix initial : 10000
-// Montant actuel de l'enchère : 12000
-// Dernier enchérisseur : 7 / Venet
-// Début de l'enchère : 2022-12-08 13:38:38.996
-// Fin de l'enchère : 2022-12-18 13:38:44.405
-    public static void bilanFinal(Connection con) throws SQLException {
+    public static void bilanEncheres(Connection con) throws SQLException {
+        /*
+    BilanEncheres affiche un message du type :
+    Votre bilan : 
+    -------------
+    4 : Bureau
+    Catégorie : 1 / Meuble
+    Prix initial : 10000
+    Montant actuel de l'enchère : 12000
+    Dernier enchérisseur : 7 / Venet
+    Début de l'enchère : 2022-12-08 13:38:38.996
+    Fin de l'enchère : 2022-12-18 13:38:44.405
+         */
         int idU = Console.entreeEntier("Id de l'utilisateur concerné : ");
         try ( PreparedStatement pst = con.prepareStatement("select objet1.id,titre,"
                 + "(select max(montant) from enchere1 where sur = objet1.id) as mMax,"
@@ -916,10 +919,61 @@ public class ProjetS5Encheres {
         }
     }
 
+    public static void bilanVentes(Connection con) throws SQLException {
+        int idU = Console.entreeEntier("Id de l'utilisateur concerné : ");
+        try ( PreparedStatement pst = con.prepareStatement("select objet1.id,titre,"
+                + "(select max(montant) from enchere1 where sur = objet1.id) as mMax,"
+                + "(select de from enchere1 where sur = objet1.id and montant = ("
+                + "select max(montant) from enchere1 where sur = objet1.id)) as idDe,"
+                + "(select utilisateur1.nom from enchere1 "
+                + "join utilisateur1 on utilisateur1.id = enchere1.de "
+                + "where sur = objet1.id and montant = ("
+                + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe,"
+                + "objet1.categorie,categorie1.nom as nomCat,prixbase,debut,fin from objet1 "
+                + "join categorie1 on categorie1.id = objet1.categorie "
+                + "where objet1.proposepar = ?")) {
+            pst.setInt(1, idU);
+            try ( ResultSet tlu = pst.executeQuery()) {
+                System.out.println("Votre bilan");
+                System.out.println("-----------");
+                while (tlu.next()) {
+                    int id = tlu.getInt("id");
+                    String titre = tlu.getString("titre");
+                    int prixbase = tlu.getInt("prixbase");
+                    Timestamp debut = tlu.getTimestamp("debut");
+                    Timestamp fin = tlu.getTimestamp("fin");
+                    int categorie = tlu.getInt("categorie");
+                    String nomCat = tlu.getString("nomCat");
+                    int mMax = tlu.getInt("mMax");
+                    int idDe = tlu.getInt("idDe");
+                    String nomDe = tlu.getString("nomDe");
+                    long finMillis = fin.getTime();
+                    String close = null;
+                    if (finMillis < System.currentTimeMillis()) {
+                        close = "ENCHERE CLOSE\n";
+                    } else {
+                        close = " ";
+                    }
+                    String mess = id + " : " + titre
+                            + "\n Catégorie : " + categorie + " / " + nomCat
+                            + "\n Prix initial : " + prixbase
+                            + "\n Montant actuel de l'enchère : " + mMax
+                            + "\n Dernier enchérisseur : " + idDe + " / " + nomDe
+                            + "\n Début de l'enchère : " + debut
+                            + "\n Fin de l'enchère : " + fin
+                            + "\n " + close;
+                    System.out.println(mess);
+                }
+            }
+        }
+    }
+
     // TODO : trouver comment faire une recherche par catégorie via un choix de 
     // noms de catégories prédéfini
     public static void recherche(Connection con) throws SQLException {
-// Permet de trouver un objet avec un extrait de son titre ou de sa description
+        /* Permet de trouver un objet avec un extrait de son titre ou de sa description
+et affiche en premier les résultats retournés grâce au titre, puis ceux 
+retournés grâce à leur description */
         String search = Console.entreeString("Veuillez entrer votre recherche.");
         String finalSearch = "%" + search + "%";
         try ( PreparedStatement pst = con.prepareStatement("select *,"
@@ -1029,7 +1083,8 @@ public class ProjetS5Encheres {
 
     public static Optional<Utilisateur> login2(Connection con, String email, String pass)
             throws SQLException {
-// Permet à un utilisateur qui vient de s'inscrire de se connecter directement
+// Utilisé pour permettre à un nouvel utilisateur de se connecter directement 
+// après son inscription
         try ( PreparedStatement pst = con.prepareStatement(
                 "select utilisateur1.id as uid,nom,prenom,codepostal from utilisateur1 "
                 + "where utilisateur1.email = ? and pass = ?")) {
@@ -1087,27 +1142,27 @@ public class ProjetS5Encheres {
         createCategorie2(con, "Jeux/Jouets");
         createCategorie2(con, "Automobile");
         createCategorie2(con, "Bricolage");
-        
+
         Timestamp ts = new Timestamp(0, 0, 0, 0, 0, 0, 0);
 
         createObjet(con, "Pull", "En laine",
-                convert(GetDate(-10)), convert(GetDate(-2)), 
+                convert(GetDate(-10)), convert(GetDate(-2)),
                 2000, 2, 1);
         createObjet(con, "Bureau", "En bois avec quatre pieds",
-                convert(GetDate(-30)), convert(GetDate(5)), 
+                convert(GetDate(-30)), convert(GetDate(5)),
                 10000, 1, 1);
         createObjet(con, "Cage à oiseaux", "En métal avec un perchoir",
-                convert(GetDate(-5)), convert(GetDate(15)), 
+                convert(GetDate(-5)), convert(GetDate(15)),
                 5000, 3, 3);
         createObjet(con, "Un truc", "sans enchère pour faire des tests",
-                convert(GetDate(-30)), convert(GetDate(30)), 
+                convert(GetDate(-30)), convert(GetDate(30)),
                 100, 1, 2);
         createObjet(con, "Pneus", "4 pneus neige peu utilisés",
-                convert(GetDate(-30)), convert(GetDate(-2)), 
+                convert(GetDate(-30)), convert(GetDate(-2)),
                 20000, 6, 4);
-        createObjet(con, "test ts", "test", 
-                new Timestamp(2022, 12, 18, 12, 0, 0, 0), 
-                new Timestamp(2023, 01, 18, 12, 0, 0, 0), 
+        createObjet(con, "test ts", "test",
+                new Timestamp(2022, 12, 18, 12, 0, 0, 0),
+                new Timestamp(2023, 01, 18, 12, 0, 0, 0),
                 100, 5, 4);
 
         createEnchere2(con, 2, 2, convert(GetDate(-15)), 11000);
@@ -1128,9 +1183,10 @@ public class ProjetS5Encheres {
             System.out.println("""
                                1) Liste des utilisateurs 
                                2) Proposer un objet 
-                               3) Proposer une ench\u00e8re 
+                               3) Proposer une enchère 
                                4) Liste des objets 
-                               5) Bilan 
+                               5) Bilan des enchères
+                               6) Bilan des ventes
                                0) Quitter""");
             rep = Console.entreeEntier("Votre choix : ");
             try {
@@ -1144,7 +1200,9 @@ public class ProjetS5Encheres {
                     afficheTousLesObjets(con);
                 } else if (rep == 5) {
 //                    Utilisateur curUser = curSec.getCurrentUser().orElseThrow();
-                    bilanFinal(con);
+                    bilanEncheres(con);
+                } else if (rep == 6) {
+                    bilanVentes(con);
                 }
             } catch (SQLException ex) {
                 System.out.println("Problème : ...");
@@ -1156,19 +1214,38 @@ public class ProjetS5Encheres {
         Connection con = null;
         Session curSec = new Session();
         boolean ok = false;
-        try {
-            con = defautConnect();
-            while (login(con).isEmpty()) {
-                login(con);
-            }
-            System.out.println("Connecté");
+        int rep = -1;
+        while (rep != 0 && !ok) {
+            System.out.println("""
+                               Accueil du site
+                               ===============
+                               1) Connexion
+                               2) Inscription
+                               0) Quitter
+                               """);
+            rep = Console.entreeEntier("Que voulez-vous faire?");
 
-            ok = true;
-        } catch (SQLException | ClassNotFoundException ex) {
-            System.out.println("Problem : " + ex.getLocalizedMessage());
-        }
-        if (ok) {
-            menuPrincipal(con);
+            try {
+                if (rep == 1) {
+                    con = defautConnect();
+//                    while (login(con).isEmpty()) {
+                        login(con);
+//                    }
+                    ok = true;
+                }
+//            else if (rep == 2) {
+//                con = defautConnect();
+//                inscription(con);
+//            }
+                System.out.println("Connecté");
+
+                ok = true;
+            } catch (SQLException | ClassNotFoundException ex) {
+                System.out.println("Problem : " + ex.getLocalizedMessage());
+            }
+            if (ok) {
+                menuPrincipal(con);
+            }
         }
     }
 
@@ -1194,8 +1271,9 @@ public class ProjetS5Encheres {
 //            afficheTousLesUtilisateurs(con);
 //            createCategorie(con);
 //            System.out.println("Catégorie créée");
-            demandeEnchere(con);
-//            bilanFinal(con);
+//            demandeEnchere(con);
+//            bilanEncheres(con);
+            bilanVentes(con);
 //            recherche(con);
 //            login(con);
 //            System.out.println("Utilisateur connecté");
