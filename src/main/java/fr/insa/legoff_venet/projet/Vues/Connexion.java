@@ -25,11 +25,19 @@ public class Connexion extends MyVerticalLayout{
         this.main = main;
         TextField lastName = new TextField("Email");
         PasswordField password = new PasswordField("Password"); 
+        
         Button login = new Button ("Connexion");
+        login.setEnabled(false);
+        //activer le bouton valider
+        password.addInputListener(event ->  {
+            login.setEnabled(true);
+        });
         Button Retour = new Button ("Retour",new Icon(VaadinIcon.ARROW_LEFT));
         login.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
-        this.add(lastName, password, login, Retour);
-        login.addClickListener((event) -> {
+        
+       this.add(lastName, password, login, Retour);
+        
+       login.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueilSite(this.main));   
          });
         Retour.addThemeVariants(ButtonVariant.LUMO_ERROR);

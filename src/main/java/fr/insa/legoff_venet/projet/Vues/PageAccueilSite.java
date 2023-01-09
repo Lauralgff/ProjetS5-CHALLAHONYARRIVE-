@@ -62,12 +62,12 @@ public class PageAccueilSite extends MyVerticalLayout {
          });
         add (Deconnextion);
         
-        Button Profil = new Button("Mon profil",
+    Button Profil = new Button("Mon profil",
                 new Icon(VaadinIcon.USER));
-        Profil.addClickListener((event)-> {
-        this.main.setMainContent(new CreerEncheres(this.main));   
-        });
-    
+    Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
+    Profil.addClickListener((event)-> {
+        this.main.setMainContent(new AfficheProfil(this.main));   
+     });
     
      Button AVendre = new Button("Vendre",
                 new Icon(VaadinIcon.WALLET));
@@ -77,12 +77,12 @@ public class PageAccueilSite extends MyVerticalLayout {
      });
      
      
-     Button AAcheter = new Button ("Acheter",
-                new Icon(VaadinIcon.CART));
+        
+    
+     this.main.entete.add(Profil,AVendre); 
      
-     this.main.entete.add(Profil,AVendre,AAcheter);   
-
+    
 }
-}    
+}  
 
     
