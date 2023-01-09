@@ -6,6 +6,7 @@ package fr.insa.legoff_venet.projet.Vues;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 /**
@@ -25,7 +26,8 @@ public class MyVerticalLayout extends VerticalLayout {
                     .set("font-style", "italic");
             this.addComponentAsFirst(nom);
             this.getStyle().set("margin-top", "32px"+CSS_COLOR);
-
+            this.setJustifyContentMode(JustifyContentMode.CENTER);
+            this.setAlignItems(FlexComponent.Alignment.STRETCH);
         }
     }
 

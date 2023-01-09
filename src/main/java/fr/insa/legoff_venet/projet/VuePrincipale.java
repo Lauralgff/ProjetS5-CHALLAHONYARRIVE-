@@ -44,8 +44,6 @@ public void setMainContent(Component c) {
         this.mainContent = new MyVerticalLayout();
         this.mainContent.setWidthFull();
         this.mainContent.setHeightFull();
-        this.mainContent.setJustifyContentMode(JustifyContentMode.CENTER);
-        this.mainContent.setAlignItems(FlexComponent.Alignment.STRETCH);
         this.add(this.mainContent);
         this.setMainContent(new PageAccueil(this));
     }  
