@@ -22,6 +22,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * and some desktop browsers.
  *
  */
+
+//http://localhost:8080/
+
 @SpringBootApplication
 @Theme(value = "mytodo")
 // @PWA(name = "My Todo", shortName = "My Todo", offlineResources = {})

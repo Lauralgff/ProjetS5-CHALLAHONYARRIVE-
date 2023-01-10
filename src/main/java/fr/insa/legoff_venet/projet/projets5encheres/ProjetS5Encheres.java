@@ -968,6 +968,29 @@ public class ProjetS5Encheres {
         }
     }
 
+    public static void afficheProfil(Connection con) throws SQLException {
+        int idu = Console.entreeEntier("Id de l'utilisateur : ");
+        try ( PreparedStatement pst = con.prepareStatement("select id,nom,"
+                + "prenom,email,codepostal from utilisateur1 "
+                + "where utilisateur1.id = ?")) {
+            pst.setInt(1, idu);
+            try ( ResultSet rs = pst.executeQuery()) {
+                System.out.println("Votre profil");
+                System.out.println("------------");
+                rs.next();
+                int id = rs.getInt("id");
+                String nom = rs.getString("nom");
+                String prenom = rs.getString("prenom");
+                String email = rs.getString("email");
+                String codepostal = rs.getString("codepostal");
+                String mess = "id : " + id + "\nNom : " + nom + "\nPrénom : "
+                        + prenom + "\nE-mail : " + email + "\nCode postal : "
+                        + codepostal;
+                System.out.println(mess);
+            }
+        }
+    }
+
     // TODO : trouver comment faire une recherche par catégorie via un choix de 
     // noms de catégories prédéfini
     public static void recherche(Connection con) throws SQLException {
@@ -1086,13 +1109,13 @@ retournés grâce à leur description */
 // Utilisé pour permettre à un nouvel utilisateur de se connecter directement 
 // après son inscription
         try ( PreparedStatement pst = con.prepareStatement(
-                "select utilisateur1.id as uid,nom,prenom,codepostal from utilisateur1 "
+                "select * from utilisateur1 "
                 + "where utilisateur1.email = ? and pass = ?")) {
             pst.setString(1, email);
             pst.setString(2, pass);
             ResultSet res = pst.executeQuery();
             if (res.next()) {
-                return Optional.of(new Utilisateur(res.getInt("uid"),
+                return Optional.of(new Utilisateur(res.getInt("id"),
                         res.getString("nom"), res.getString("prenom"),
                         email, pass, res.getString("codepostal")));
             } else {
@@ -1229,7 +1252,7 @@ retournés grâce à leur description */
                 if (rep == 1) {
                     con = defautConnect();
 //                    while (login(con).isEmpty()) {
-                        login(con);
+                    login(con);
 //                    }
                     ok = true;
                 }
@@ -1273,13 +1296,14 @@ retournés grâce à leur description */
 //            System.out.println("Catégorie créée");
 //            demandeEnchere(con);
 //            bilanEncheres(con);
-            bilanVentes(con);
+//            bilanVentes(con);
 //            recherche(con);
-//            login(con);
+            login(con);
 //            System.out.println("Utilisateur connecté");
 //            demandeUtilisateur(con);
 //            menuPrincipal(con);
 //            toutRecreer(con);
+//            afficheProfil(con);
 //            menuLogin();
 
         } catch (ClassNotFoundException ex) {

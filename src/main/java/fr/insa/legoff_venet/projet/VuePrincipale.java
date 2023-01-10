@@ -13,15 +13,15 @@ import fr.insa.legoff_venet.projet.Vues.MyHorizontalLayout;
 import fr.insa.legoff_venet.projet.Vues.MyVerticalLayout;
 import fr.insa.legoff_venet.projet.Vues.PageAccueil;
 
-
 /**
  *
  * @author laura
  */
-  @Route(value = "")
+@Route(value = "")
 @PageTitle("Projet Encheres")
 public class VuePrincipale extends VerticalLayout {
-    
+
+    private SessionInfo sessionInfo;
 
     public MyHorizontalLayout entete;
     public MyVerticalLayout mainContent;
@@ -31,7 +31,7 @@ public class VuePrincipale extends VerticalLayout {
         this.entete.add(c);
     }
 
-public void setMainContent(Component c) {
+    public void setMainContent(Component c) {
         this.mainContent.removeAll();
         this.mainContent.add(c);
     }
@@ -46,5 +46,9 @@ public void setMainContent(Component c) {
         this.mainContent.setHeightFull();
         this.add(this.mainContent);
         this.setMainContent(new PageAccueil(this));
-    }  
+    }
+
+    public SessionInfo getSessionInfo() {
+        return sessionInfo;
+    }
 }
