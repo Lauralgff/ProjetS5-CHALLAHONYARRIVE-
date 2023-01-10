@@ -53,7 +53,7 @@ public class PageAccueilSite extends MyVerticalLayout {
         RechercheCat.setItems(items);
         
         //Bouton de connexion, retour à la page d'accueil       
-        Button Deconnextion = new Button ("Déconnextion",new Icon(VaadinIcon.ARROW_LEFT));
+        Button Deconnextion = new Button ("Déconnexion",new Icon(VaadinIcon.ARROW_LEFT));
         Deconnextion.addThemeVariants(ButtonVariant.LUMO_ERROR);
         Deconnextion.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueil(this.main));   
