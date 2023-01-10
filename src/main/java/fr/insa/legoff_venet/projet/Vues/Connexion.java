@@ -50,6 +50,7 @@ public class Connexion extends MyVerticalLayout{
 //            this.main.setMainContent(new PageAccueilSite(this.main));   
 //         });
         this.vbLogin.addClickListener((event) -> {
+            this.main.setMainContent(new PageAccueilSite(this.main));
             this.doLogin();
         });
 //        Retour.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -72,7 +73,6 @@ public class Connexion extends MyVerticalLayout{
                 Notification.show("Email ou mot de passe invalide");
             } else {
                 this.main.getSessionInfo().setCurrentUser(user);
-                this.main.setMainContent(new PageAccueilSite(this.main));
             }
         } catch (SQLException ex) {
             Notification.show("Problème interne : " + ex.getLocalizedMessage());
