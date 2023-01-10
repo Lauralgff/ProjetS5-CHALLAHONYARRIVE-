@@ -10,6 +10,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import fr.insa.legoff_venet.projet.VuePrincipale;
@@ -69,8 +70,8 @@ public class Connexion extends MyVerticalLayout{
             Connection con = this.main.getSessionInfo().getCon();
             Optional<Utilisateur> user = ProjetS5Encheres.login2(con, email, pass);
             if (user.isEmpty()) {
-                Notification.show("Email ou mot de passe invalide");
-            } else {
+                Notification.show("Utilisateur ou mot de passe invalide");    
+                } else {
                 this.main.getSessionInfo().setCurrentUser(user);
                 this.main.setMainContent(new PageAccueilSite(this.main));
             }

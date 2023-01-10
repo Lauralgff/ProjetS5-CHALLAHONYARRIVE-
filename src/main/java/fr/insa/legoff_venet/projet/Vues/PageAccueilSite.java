@@ -37,8 +37,9 @@ public class PageAccueilSite extends MyVerticalLayout {
         
         this.main = main;
         //Barre de recherche par catégories
-        ComboBox<String> RechercheCat = new ComboBox<>("Catégories");
+        ComboBox<String> RechercheCat = new ComboBox<>();
         RechercheCat.setAllowCustomValue(true);
+        RechercheCat.setPlaceholder("Rechercher par catégorie");
         RechercheCat.addCustomValueSetListener(e -> {
             String customValue = e.getDetail();
             items.add(customValue);
@@ -50,18 +51,16 @@ public class PageAccueilSite extends MyVerticalLayout {
         textField.setPlaceholder("Search");
         textField.setPrefixComponent(VaadinIcon.SEARCH.create());
         RechercheCat.setItems(items);
-        RechercheCat.setHelperText("Sélectionnez une catégorie");
         
-        add (textField);
-        add (RechercheCat);
-       
+        //Bouton de connexion, retour à la page d'accueil       
         Button Deconnextion = new Button ("Déconnextion",new Icon(VaadinIcon.ARROW_LEFT));
         Deconnextion.addThemeVariants(ButtonVariant.LUMO_ERROR);
         Deconnextion.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueil(this.main));   
          });
         add (Deconnextion);
-        
+    
+    //Bouton profil, entete
     Button Profil = new Button("Mon profil",
                 new Icon(VaadinIcon.USER));
     Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
@@ -69,17 +68,15 @@ public class PageAccueilSite extends MyVerticalLayout {
         this.main.setMainContent(new AfficheProfil(this.main));   
      });
     
+    //Bouton Vendre, entete
      Button AVendre = new Button("Vendre",
                 new Icon(VaadinIcon.WALLET));
      AVendre.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
      AVendre.addClickListener((event)-> {
         this.main.setMainContent(new CreerEncheres(this.main));   
      });
-     
-     
-        
     
-     this.main.entete.add(Profil,AVendre); 
+     this.main.entete.add(Profil,AVendre, textField, RechercheCat); 
      
     
 }

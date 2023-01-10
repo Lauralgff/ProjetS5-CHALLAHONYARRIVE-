@@ -6,6 +6,7 @@ package fr.insa.legoff_venet.projet.Vues;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -27,6 +28,7 @@ public class Inscription extends MyVerticalLayout {
   
     this.main = main;
     
+        this.add(new H1("Inscription"));
     
         TextField firstName = new TextField("Prénom");
         TextField lastName = new TextField("Nom");
