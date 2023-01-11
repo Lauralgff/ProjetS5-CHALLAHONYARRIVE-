@@ -282,7 +282,6 @@ public class ProjetS5Encheres {
 //            con.setAutoCommit(true);
 //        }
 //    }
-
     public static void demandeUtilisateur(Connection con) throws SQLException {
         boolean existe = true;
         while (existe) {
@@ -458,7 +457,7 @@ public class ProjetS5Encheres {
 
     public static boolean finiOuPas(Connection con, int idObj) throws SQLException {
         boolean enCours = true;
-        con.setAutoCommit(false);
+//        con.setAutoCommit(false);
         try {
             String sqlChercheFin
                     = "select fin from objet1 where id = ?";
@@ -677,10 +676,11 @@ public class ProjetS5Encheres {
             }
         }
     }
-    
-    public static void afficheVentesEnCours (Connection con) throws SQLException {
-        try (Statement st = con.createStatement()) {
-            try ( ResultSet tlu = st.executeQuery("select * from objet1")) {
+
+    public static void afficheVentesEnCours(Connection con) throws SQLException {
+        try ( Statement st = con.createStatement()) {
+            try ( ResultSet tlu = st.executeQuery("select * from objet1 "
+                    + "order by debut desc")) {
                 while (tlu.next()) {
                     int id = tlu.getInt("id");
                     String titre = tlu.getString("titre");
@@ -694,7 +694,7 @@ public class ProjetS5Encheres {
                             + "\n Début de l'enchère : " + debut + "\n Fin de l'enchère : "
                             + fin + "\n Prix initial : " + prixbase + "\n Catégorie : "
                             + categorie + "\n Proposé par : " + proposepar;
-                    if (fin.getTime() >= System.currentTimeMillis()){
+                    if (fin.getTime() >= System.currentTimeMillis()) {
                         System.out.println(mess);
                     }
                 }
@@ -872,7 +872,6 @@ public class ProjetS5Encheres {
 //            }
 //        }
 //    }
-
     public static void bilanEncheres(Connection con) throws SQLException {
         /*
     BilanEncheres affiche un message du type :
@@ -1134,7 +1133,9 @@ retournés grâce à leur description */
             pst.setString(2, pass);
             ResultSet res = pst.executeQuery();
             if (res.next()) {
-                return Optional.of(new Utilisateur(res.getInt("id"),
+                int id = res.getInt("id");
+                System.out.println("id : " + id);
+                return Optional.of(new Utilisateur(id,
                         res.getString("nom"), res.getString("prenom"),
                         email, pass, res.getString("codepostal")));
             } else {
@@ -1254,7 +1255,6 @@ retournés grâce à leur description */
 
     public static void menuLogin() {
         Connection con = null;
-        Session curSec = new Session();
         boolean ok = false;
         int rep = -1;
         while (rep != 0 && !ok) {
@@ -1270,28 +1270,32 @@ retournés grâce à leur description */
             try {
                 if (rep == 1) {
                     con = defautConnect();
-//                    while (login(con).isEmpty()) {
-                    login(con);
-//                    }
+                    String email = Console.entreeString("Email : ");
+                    String pass = Console.entreeString("pass : ");
+                    login2(con, email, pass);
                     ok = true;
                 }
 //            else if (rep == 2) {
 //                con = defautConnect();
 //                inscription(con);
+//                ok = true;
 //            }
-                System.out.println("Connecté");
-
-                ok = true;
+                if (ok) {
+                    System.out.println("Connecté");
+                } else {
+                    System.out.println("Problème");
+                }
             } catch (SQLException | ClassNotFoundException ex) {
                 System.out.println("Problem : " + ex.getLocalizedMessage());
             }
-            if (ok) {
-                menuPrincipal(con);
-            }
+
+        }
+        if (ok) {
+            menuPrincipal(con);
         }
     }
 
-    public static void menuObjet(Connection con) {
+    public static void menuTest() {
 
     }
 
@@ -1317,14 +1321,16 @@ retournés grâce à leur description */
 //            bilanEncheres(con);
 //            bilanVentes(con);
 //            recherche(con);
-//            login(con);
+            String email = Console.entreeString("Email : ");
+            String pass = Console.entreeString("pass : ");
+            login2(con, email, pass);
 //            System.out.println("Utilisateur connecté");
 //            demandeUtilisateur(con);
 //            menuPrincipal(con);
 //            toutRecreer(con);
 //            afficheProfil(con);
 //            afficheVentesEnCours(con);
-            menuLogin();
+//        menuLogin();
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ProjetS5Encheres.class
@@ -1335,5 +1341,4 @@ retournés grâce à leur description */
                     .getName()).log(Level.SEVERE, null, ex);
         }
     }
-
 }
