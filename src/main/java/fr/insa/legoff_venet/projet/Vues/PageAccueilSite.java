@@ -26,7 +26,7 @@ public class PageAccueilSite extends MyVerticalLayout {
             Arrays.asList("Meubles", "Habits", "Sport"));
     public TextField textfield = new TextField ();
     public ComboBox<String> RechercheCat = new ComboBox<>();
-    public Button Deconnextion = new Button ("Déconnexion",new Icon(VaadinIcon.ARROW_LEFT));
+    Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
     public Button Profil = new Button( "Mon profil",new Icon(VaadinIcon.USER));
     public Button AVendre = new Button ("Vendre",new Icon(VaadinIcon.WALLET));
     
@@ -49,15 +49,13 @@ public class PageAccueilSite extends MyVerticalLayout {
         this.textfield.setPrefixComponent(VaadinIcon.SEARCH.create());
         
         
-        //Bouton de connexion, retour à la page d'accueil       
-        
-        this.Deconnextion.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        this.Deconnextion.addClickListener((event) -> {
+        //Bouton de deconnexion, retour à la page d'accueil      
+        this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        this.Deconnexion.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueil(this.main)); 
             this.main.entete.removeAll();
          });
-        add (Deconnextion);
-    
+            
     //Bouton profil, entete
     this.Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
     this.Profil.addClickListener((event)-> {
@@ -70,7 +68,7 @@ public class PageAccueilSite extends MyVerticalLayout {
         this.main.setMainContent(new CreerEncheres(this.main));   
      });
     
-     this.main.entete.add(Profil,AVendre, textfield, RechercheCat); 
+     this.main.entete.add(Profil,AVendre, textfield, RechercheCat,Deconnexion); 
      
     
 }

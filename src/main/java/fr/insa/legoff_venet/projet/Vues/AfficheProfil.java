@@ -26,7 +26,7 @@ public class AfficheProfil extends MyVerticalLayout {
     private VuePrincipale main;
     public TextField textfield = new TextField ();
     public ComboBox<String> RechercheCat = new ComboBox<>();
-    public Button Deconnextion = new Button ("Déconnexion",new Icon(VaadinIcon.ARROW_LEFT));
+    Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
     public Button Profil = new Button( "Mon profil",new Icon(VaadinIcon.USER));
     public Button AVendre = new Button ("Vendre",new Icon(VaadinIcon.WALLET));
     private List<String> items = new ArrayList<>(
@@ -85,10 +85,7 @@ public class AfficheProfil extends MyVerticalLayout {
         this.AVendre.addClickListener((event)-> {
             this.main.setMainContent(new CreerEncheres(this.main));   
         });
-        
-        
-        
-    
+           
        //Bouton d'affichage des Ventes
        Button Mesventes = new Button ("Mes Ventes",new Icon(VaadinIcon.WALLET));
        Mesventes.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
@@ -102,16 +99,23 @@ public class AfficheProfil extends MyVerticalLayout {
        MesEncheres.addClickListener((event)-> {
         this.main.setMainContent(new MesVentes(this.main));   
        });
-        
+ 
+       //Bouton de deconnexion, retour à la page d'accueil
+        this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        this.Deconnexion.addClickListener((event) -> {
+            this.main.setMainContent(new PageAccueil(this.main)); 
+            this.main.entete.removeAll();
+         });
         //Button de retour à la page d'accueil site
         Button home = new Button(new Icon(VaadinIcon.HOME));
         home.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         home.addClickListener((event)-> {
             this.main.setMainContent(new PageAccueilSite(this.main));
             this.main.entete.removeAll();
-            this.main.entete.add(Profil,AVendre, textfield, RechercheCat);
+            this.main.entete.add(Profil,AVendre, textfield, RechercheCat,Deconnexion);
         });
         
+      
         add (Mesventes, MesEncheres, home);
     }
 }
