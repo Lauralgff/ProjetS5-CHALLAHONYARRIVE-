@@ -41,20 +41,29 @@ public class CreerEncheres extends MyVerticalLayout {
     public Button Profil = new Button( "Mon profil",new Icon(VaadinIcon.USER));
     public Button AVendre = new Button ("Vendre",new Icon(VaadinIcon.WALLET));
     
+    private Button valider;
+    
+    private TextField title;
+    private TextField prix;
+    private TextArea description;
+    private DatePicker date;
+    private TimePicker to;
+//    private ComboBox<String> ChoixCat;
+    
     public CreerEncheres(VuePrincipale main) {
 
         this.main = main;
         
         this.add(new H1("Créez votre enchère !"));
-        TextField title = new TextField("Titre");
-        TextField prix = new TextField();
-        prix.setSuffixComponent(new Span("EUR"));
-        TextArea description = new TextArea();
+        title = new TextField("Titre");
+        prix = new TextField();
+        prix.setSuffixComponent(new Span("cts"));
+        description = new TextArea();
         description.setWidthFull();
         description.setLabel("Description");   
-        DatePicker date = new DatePicker("Date de fin");
-        TimePicker to = new TimePicker("Heure de fin");
-        ComboBox<String> RechercheCat = new ComboBox<>("Catégories");
+        date = new DatePicker("Date de fin");
+        to = new TimePicker("Heure de fin");
+        RechercheCat = new ComboBox<>("Catégories");
         RechercheCat.setAllowCustomValue(true);
         RechercheCat.addCustomValueSetListener(e -> {
             String customValue = e.getDetail();
@@ -113,7 +122,7 @@ public class CreerEncheres extends MyVerticalLayout {
             this.main.entete.add(Profil,AVendre,textfield,this.RechercheCat, Deconnexion);
         });
         
-        Button valider = new Button ("Valider");
+        valider = new Button ("Valider");
         valider.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
          valider.addClickListener(clickEvent -> {
             valider.setEnabled(false);
@@ -129,4 +138,12 @@ public class CreerEncheres extends MyVerticalLayout {
             
         add (valider, home);
     }
+    
+    public void doCreerEnchere() {
+        String titre = this.title.getValue();
+        int prix = Integer.parseInt(this.prix.getValue());
+        String description = this.description.getValue();
+        
+    }
+    
 }
