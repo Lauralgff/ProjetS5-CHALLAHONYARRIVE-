@@ -41,19 +41,20 @@ public class AfficheProfil extends MyVerticalLayout {
         avatar.setWidth("150px");
         
         //ptete rajouter un get qqchose pour choper l'email 
-        Label nom = new Label("Nom");
+        Label nom = new Label(this.main.getSessionInfo().getUserNom());
         nom.getStyle().set("font-size", "20px");
         nom.getStyle().set("font-weight", "bold");
         
-        Label prenom = new Label("Prénom");
+        Label prenom = new Label(this.main.getSessionInfo().getUserPrenom());
         prenom.getStyle().set("font-size", "20px");
         prenom.getStyle().set("font-weight", "bold");
         
-        Label email = new Label("Email");
+        Label email = new Label(this.main.getSessionInfo().getUserEmail()
+        + " (" + String.valueOf(this.main.getSessionInfo().getUserId()) + ")");
         email.getStyle().set("font-size", "20px");
         email.getStyle().set("font-weight", "bold");
         
-        Label postcode = new Label("Code Postal");
+        Label postcode = new Label(this.main.getSessionInfo().getUserCodePostal());
         postcode.getStyle().set("font-size", "20px");
         postcode.getStyle().set("font-weight", "bold");
         

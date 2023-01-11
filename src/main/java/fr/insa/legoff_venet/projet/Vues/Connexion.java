@@ -76,7 +76,7 @@ public class Connexion extends MyVerticalLayout{
                 this.main.getSessionInfo().setCurrentUser(user);
                 this.main.setMainContent(new PageAccueilSite(this.main));
                 Notification.show("Bienvenue " 
-                        + this.main.getSessionInfo().getUserNom()
+                        + this.main.getSessionInfo().getUserPrenom()
                         + " (" + this.main.getSessionInfo().getUserId() +")");
                 System.out.println("login oké");
             }

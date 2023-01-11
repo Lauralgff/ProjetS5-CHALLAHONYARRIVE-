@@ -1153,9 +1153,13 @@ retournés grâce à leur description */
         String pass = Console.entreeString("Mot de passe : ");
         String codepostal = Console.entreeString("Code postal : ");
         try {
+            if (nom == null || prenom == null || email == null) {
+                System.out.println("Veuillez remplir tous les champs.");
+            } else {
             createUtilisateur(con, nom, prenom, email, pass, codepostal);
         login2(con, email, pass);
         System.out.println("Nouvel utilisateur inscrit");
+            }
         } catch (SQLException | EmailExisteDejaException ex) {
             throw ex;
         }
@@ -1189,6 +1193,7 @@ retournés grâce à leur description */
         createCategorie2(con, "Jeux/Jouets");
         createCategorie2(con, "Automobile");
         createCategorie2(con, "Bricolage");
+        createCategorie2(con, "Décoration");
 
         Timestamp ts = new Timestamp(0, 0, 0, 0, 0, 0, 0);
 
@@ -1207,10 +1212,10 @@ retournés grâce à leur description */
         createObjet(con, "Pneus", "4 pneus neige peu utilisés",
                 convert(GetDate(-30)), convert(GetDate(-2)),
                 20000, 6, 4);
-        createObjet(con, "test ts", "test",
-                new Timestamp(2022, 12, 18, 12, 0, 0, 0),
-                new Timestamp(2023, 01, 18, 12, 0, 0, 0),
-                100, 5, 4);
+        createObjet(con, "Cales-porte bretzel", "Lot de 20 cales-porte "
+                + "bretzel de différents coloris. \nMatière : PP ou PP chargé bois à 30%.",
+                convert(GetDate(-8)),convert(GetDate(16)),
+                2500, 8, 6);
 
         createEnchere2(con, 2, 2, convert(GetDate(-15)), 11000);
         createEnchere2(con, 4, 2, convert(GetDate(-5)), 12000);
