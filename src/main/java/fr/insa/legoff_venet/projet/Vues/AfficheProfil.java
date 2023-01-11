@@ -4,15 +4,18 @@
  */
 package fr.insa.legoff_venet.projet.Vues;
 
-import static com.fasterxml.jackson.databind.util.ClassUtil.name;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.textfield.TextField;
 import fr.insa.legoff_venet.projet.VuePrincipale;
-import static org.apache.tomcat.jni.User.username;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -21,7 +24,14 @@ import static org.apache.tomcat.jni.User.username;
 public class AfficheProfil extends MyVerticalLayout {
     
     private VuePrincipale main;
-        
+    public TextField textfield = new TextField ();
+    public ComboBox<String> RechercheCat = new ComboBox<>();
+    public Button Deconnextion = new Button ("Déconnexion",new Icon(VaadinIcon.ARROW_LEFT));
+    public Button Profil = new Button( "Mon profil",new Icon(VaadinIcon.USER));
+    public Button AVendre = new Button ("Vendre",new Icon(VaadinIcon.WALLET));
+    private List<String> items = new ArrayList<>(
+            Arrays.asList("Meubles", "Habits", "Sport"));
+    
     public AfficheProfil (VuePrincipale main){
         this.main = main;
         
@@ -48,6 +58,36 @@ public class AfficheProfil extends MyVerticalLayout {
         postcode.getStyle().set("font-weight", "bold");
         
         add(avatar, nom, prenom, email, postcode);
+        
+        //Barre de recherche par catégories
+        this.RechercheCat.setAllowCustomValue(true);
+        this.RechercheCat.setPlaceholder("Rechercher par catégorie");
+        this.RechercheCat.addCustomValueSetListener(e -> {
+            String customValue = e.getDetail();
+            items.add(customValue);
+            RechercheCat.setItems(items);
+            RechercheCat.setValue(customValue);
+        });
+        RechercheCat.setItems(items);
+        
+        //Barre de recherche textuelle
+        this.textfield.setPlaceholder("Search");
+        this.textfield.setPrefixComponent(VaadinIcon.SEARCH.create());
+        
+        //Bouton profil, entete
+        this.Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
+        this.Profil.addClickListener((event)-> {
+            this.main.setMainContent(new AfficheProfil(this.main));   
+        });
+    
+        //Bouton Vendre, entete
+        this.AVendre.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
+        this.AVendre.addClickListener((event)-> {
+            this.main.setMainContent(new CreerEncheres(this.main));   
+        });
+        
+        
+        
     
        //Bouton d'affichage des Ventes
        Button Mesventes = new Button ("Mes Ventes",new Icon(VaadinIcon.WALLET));
@@ -68,6 +108,8 @@ public class AfficheProfil extends MyVerticalLayout {
         home.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         home.addClickListener((event)-> {
             this.main.setMainContent(new PageAccueilSite(this.main));
+            this.main.entete.removeAll();
+            this.main.entete.add(Profil,AVendre, textfield, RechercheCat);
         });
         
         add (Mesventes, MesEncheres, home);
