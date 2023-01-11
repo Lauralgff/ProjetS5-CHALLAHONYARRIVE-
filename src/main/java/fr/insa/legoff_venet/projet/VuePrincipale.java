@@ -12,6 +12,8 @@ import com.vaadin.flow.router.Route;
 import fr.insa.legoff_venet.projet.Vues.MyHorizontalLayout;
 import fr.insa.legoff_venet.projet.Vues.MyVerticalLayout;
 import fr.insa.legoff_venet.projet.Vues.PageAccueil;
+import fr.insa.legoff_venet.projet.projets5encheres.ProjetS5Encheres;
+import java.sql.SQLException;
 
 /**
  *
@@ -37,6 +39,7 @@ public class VuePrincipale extends VerticalLayout {
     }
 
     public VuePrincipale() {
+        this.sessionInfo = new SessionInfo();
         this.entete = new MyHorizontalLayout();
         this.entete.setWidthFull();
         this.add(this.entete);
@@ -46,6 +49,10 @@ public class VuePrincipale extends VerticalLayout {
         this.mainContent.setHeightFull();
         this.add(this.mainContent);
         this.setMainContent(new PageAccueil(this));
+        try {
+            this.sessionInfo.setCon(ProjetS5Encheres.defautConnect());
+        } catch (ClassNotFoundException | SQLException ex) {
+        }
     }
 
     public SessionInfo getSessionInfo() {

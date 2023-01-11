@@ -1145,7 +1145,6 @@ retournés grâce à leur description */
         }
     }
 
-// TODO??
     public static void inscription(Connection con)
             throws SQLException, EmailExisteDejaException {
         String nom = Console.entreeString("Nom : ");
@@ -1153,9 +1152,14 @@ retournés grâce à leur description */
         String email = Console.entreeString("email : ");
         String pass = Console.entreeString("Mot de passe : ");
         String codepostal = Console.entreeString("Code postal : ");
-        createUtilisateur(con, nom, prenom, email, pass, codepostal);
+        try {
+            createUtilisateur(con, nom, prenom, email, pass, codepostal);
         login2(con, email, pass);
         System.out.println("Nouvel utilisateur inscrit");
+        } catch (SQLException | EmailExisteDejaException ex) {
+            throw ex;
+        }
+        
     }
 
     public static void toutRecreer(Connection con) throws SQLException {
@@ -1275,17 +1279,18 @@ retournés grâce à leur description */
                     login2(con, email, pass);
                     ok = true;
                 }
-//            else if (rep == 2) {
-//                con = defautConnect();
-//                inscription(con);
-//                ok = true;
-//            }
+                else if (rep == 2) {
+                    con = defautConnect();
+                    inscription(con);
+                    ok = true;
+                }
                 if (ok) {
                     System.out.println("Connecté");
                 } else {
                     System.out.println("Problème");
                 }
-            } catch (SQLException | ClassNotFoundException ex) {
+            } catch (SQLException | ClassNotFoundException | 
+                    EmailExisteDejaException ex) {
                 System.out.println("Problem : " + ex.getLocalizedMessage());
             }
 
@@ -1321,16 +1326,16 @@ retournés grâce à leur description */
 //            bilanEncheres(con);
 //            bilanVentes(con);
 //            recherche(con);
-            String email = Console.entreeString("Email : ");
-            String pass = Console.entreeString("pass : ");
-            login2(con, email, pass);
+//            String email = Console.entreeString("Email : ");
+//            String pass = Console.entreeString("pass : ");
+//            login2(con, email, pass);
 //            System.out.println("Utilisateur connecté");
 //            demandeUtilisateur(con);
 //            menuPrincipal(con);
 //            toutRecreer(con);
 //            afficheProfil(con);
 //            afficheVentesEnCours(con);
-//        menuLogin();
+        menuLogin();
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ProjetS5Encheres.class

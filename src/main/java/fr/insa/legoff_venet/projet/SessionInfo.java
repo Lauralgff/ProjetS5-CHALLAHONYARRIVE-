@@ -49,5 +49,17 @@ public class SessionInfo {
     public String getUserNom() {
         return this.currentUser.orElseThrow().getNom();
     }
+    
+    public String getUserPrenom() {
+        return this.currentUser.orElseThrow().getPrenom();
+    }
+    
+    public String getUserEmail() {
+        return this.currentUser.orElseThrow().getEmail();
+    }
+    
+    public String getUserCodePostal() {
+        return this.currentUser.orElseThrow().getCodepostal();
+    }
 
 }
