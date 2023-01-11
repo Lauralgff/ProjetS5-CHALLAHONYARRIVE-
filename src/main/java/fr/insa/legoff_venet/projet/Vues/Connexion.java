@@ -52,6 +52,7 @@ public class Connexion extends MyVerticalLayout{
 //         });
         this.vbLogin.addClickListener((event) -> {
             this.doLogin();
+            System.out.println("théoriquement on est connecté");
         });
 //        Retour.addThemeVariants(ButtonVariant.LUMO_ERROR);
         this.vbRetour.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -74,6 +75,7 @@ public class Connexion extends MyVerticalLayout{
                 } else {
                 this.main.getSessionInfo().setCurrentUser(user);
                 this.main.setMainContent(new PageAccueilSite(this.main));
+                System.out.println("login oké");
             }
         } catch (SQLException ex) {
             Notification.show("Problème interne : " + ex.getLocalizedMessage());
