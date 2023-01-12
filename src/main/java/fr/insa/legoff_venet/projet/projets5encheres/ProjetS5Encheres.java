@@ -370,6 +370,14 @@ public class ProjetS5Encheres {
             con.setAutoCommit(true);
         }
     }
+    
+//    public static int getNomCategorie(Connection con, String nom) {
+//        try ( PreparedStatement pst = con.prepareStatement(
+//            """
+//            select categorie1.id from categorie1 where categorie1.nom = ?
+//            """)){
+//                pst.setInt(1, categorie);
+//    }
 
     public static int createObjet(Connection con, String titre, String description,
             Timestamp debut, Timestamp fin, int prixbase, int categorie, int proposepar)
@@ -386,6 +394,12 @@ public class ProjetS5Encheres {
             pst.setTimestamp(3, debut);
             pst.setTimestamp(4, fin);
             pst.setInt(5, prixbase);
+//            try ( PreparedStatement pst2 = con.prepareStatement(
+//            """
+//            select categorie1.id from categorie1 where categorie1.nom = ?
+//            """)){
+//                pst.setInt(1, categorie);
+//            }
             pst.setInt(6, categorie);
             pst.setInt(7, proposepar);
             pst.executeUpdate();
