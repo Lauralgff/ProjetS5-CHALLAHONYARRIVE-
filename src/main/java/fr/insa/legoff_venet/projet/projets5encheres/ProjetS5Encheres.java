@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.Optional;
 import fr.insa.legoff_venet.Session.Session;
 import fr.insa.legoff_venet.projet.utils.Console;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 /**
  *
@@ -312,6 +314,12 @@ public class ProjetS5Encheres {
 // Convertit une date en Timestamp
     public static java.sql.Timestamp convert(java.util.Date date) {
         return new java.sql.Timestamp(date.getTime());
+    }
+    
+    public static Date convertToDateUsingInstant(LocalDate date) {
+        return java.util.Date.from(date.atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
     }
 
     public static int createCategorie(Connection con) throws SQLException {
