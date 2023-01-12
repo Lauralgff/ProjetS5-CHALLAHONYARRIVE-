@@ -22,7 +22,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import fr.insa.legoff_venet.projet.VuePrincipale;
-import java.time.LocalDate;
+import fr.insa.legoff_venet.projet.projets5encheres.Categorie;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -31,6 +31,7 @@ import fr.insa.legoff_venet.projet.projets5encheres.ProjetS5Encheres;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalTime;
 
 /**
  *
@@ -61,37 +62,23 @@ public class CreerEncheres extends MyVerticalLayout {
         this.main = main;
 
         this.add(new H1("Créez votre enchère !"));
-        title = new TextField("Titre");
-        prix = new TextField();
+        title = new TextField("Titre *");
+        prix = new TextField("Prix de départ *");
         prix.setSuffixComponent(new Span("cts"));
         description = new TextArea();
         description.setWidthFull();
         description.setLabel("Description");
-        date = new DatePicker("Date de fin");
-        to = new TimePicker("Heure de fin");
-        ChoixCat = new ComboBox<>("Catégories");
+        date = new DatePicker("Date de fin *");
+        to = new TimePicker("Heure de fin *");
+        ChoixCat = new ComboBox<>("Catégories *");
         ChoixCat.setAllowCustomValue(true);
         ChoixCat.addCustomValueSetListener(e -> {
             String customValue = e.getDetail();
             items.add(customValue);
-            items.add(1, "Vêtement");
-            items.add(2, "Meuble");
-            items.add(3, "Sport");
             ChoixCat.setItems(items);
             ChoixCat.setValue(customValue);
         });
 
-//        ComboBox cb = new ComboBox("");
-//        cb.add
-//        cb.addItem(1);
-//        cb.setItemCaption(1, "India");//sets the displayed caption of the Item 1 to India
-//        cb.addItem(2);
-//        cb.setItemCaption(2, "USA");//sets the displayed caption of the Item 2 to USA
-
-        //ComboBox<Person> test = new ComboBox<>();
-//personSelector.setItems(allPersons);
-//personSelector.setItemLabelGenerator(person ->
-//  person.getFirstName() + " " + person.getLastName());
         FormLayout formLayout = new FormLayout();
         formLayout.add(title, prix, ChoixCat, description, date, to);
         formLayout.setColspan(description, 3);
@@ -141,9 +128,10 @@ public class CreerEncheres extends MyVerticalLayout {
             this.main.entete.add(Profil, AVendre, textfield, this.RechercheCat, Deconnexion);
         });
 
-        valider = new Button("Valider");
+        this.valider = new Button("Valider");
         valider.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
         valider.addClickListener(clickEvent -> {
+            doCreerEnchere();
             valider.setEnabled(false);
 
             Notification notification = Notification
@@ -159,24 +147,39 @@ public class CreerEncheres extends MyVerticalLayout {
     }
 
     public void doCreerEnchere() {
+        Connection con = this.main.getSessionInfo().getCon();
         String titre = this.title.getValue();
-        int prix = Integer.parseInt(this.prix.getValue());
-        String description = this.description.getValue();
-//        int categorie = this.ChoixCat.getValue();
-        Date date = ConvertDate.convertToDate(this.date.getValue());
+        int prixbase = Integer.parseInt(this.prix.getValue());
+        String descript = this.description.getValue();
+        Date dateFin = ConvertDate.convertToDate(this.date.getValue());
         Date heure = ConvertDate.convertToDate(this.to.getValue());
-        long dateMillis = date.getTime() + heure.getTime();
+        dateFin = ProjetS5Encheres.convertToDateUsingInstant(this.date.getValue());
+        // TODO : régler le problème des dates
+//        LocalDate dateFin = this.date.getValue();
+//        LocalTime heure = this.to.getValue();
+        long dateMillis = dateFin.getTime() + heure.getTime();
+//        long dateMillis = dateFin.get
         Timestamp fin = new Timestamp(dateMillis);
         int proposepar = this.main.getSessionInfo().getUserId();
+        int categorie = 0;
         if (dateMillis <= System.currentTimeMillis()) {
             Notification.show("La date de fin de l'enchère doit être "
                     + "ultérieure à la date actuelle.");
+        } else if (titre.isBlank() || prixbase == 0 || dateMillis == 0 
+                || dateFin == null || heure == null) {
+            Notification.show("Les champs * doivent tous être remplis.");
         } else {
             try {
-                Connection con = this.main.getSessionInfo().getCon();
-                ProjetS5Encheres.createObjet(con, titre, description,
+                categorie = Categorie.getIdCatFromNom(con, this.ChoixCat.getValue());
+                if (categorie == 0) {
+                    Notification.show("Les champs * doivent tous être remplis.");
+                } else {
+                ProjetS5Encheres.createObjet(con, titre, descript,
                         new Timestamp(System.currentTimeMillis()), fin,
-                        prix, prix, proposepar);
+                        prixbase, categorie, proposepar);
+                this.main.setMainContent(new PageAccueilSite(this.main));
+                Notification.show("Vente créée! id de l'objet : ");
+                }
             } catch (SQLException ex) {
                 Notification.show("Problème interne : " + ex.getLocalizedMessage());
             }

@@ -4,6 +4,11 @@
  */
 package fr.insa.legoff_venet.projet.projets5encheres;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  *
  * @author i5e330
@@ -34,5 +39,22 @@ public class Categorie {
         this.nom = nom;
     }
     
+    public static int getIdCatFromNom(Connection con, String nom) throws SQLException {
+        int id = 0;
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+            select categorie1.id from categorie1 where categorie1.nom = ?
+            """)) {
+            pst.setString(1, nom);
+            try ( ResultSet rs = pst.executeQuery()) {
+                rs.next();
+                id = rs.getInt("id");
+            }
+        } catch (SQLException ex) {
+            throw ex;
+        }
+        System.out.println(id);
+        return id;
+    }
     
 }

@@ -315,7 +315,7 @@ public class ProjetS5Encheres {
     public static java.sql.Timestamp convert(java.util.Date date) {
         return new java.sql.Timestamp(date.getTime());
     }
-    
+
     public static Date convertToDateUsingInstant(LocalDate date) {
         return java.util.Date.from(date.atStartOfDay()
                 .atZone(ZoneId.systemDefault())
@@ -370,14 +370,6 @@ public class ProjetS5Encheres {
             con.setAutoCommit(true);
         }
     }
-    
-//    public static int getNomCategorie(Connection con, String nom) {
-//        try ( PreparedStatement pst = con.prepareStatement(
-//            """
-//            select categorie1.id from categorie1 where categorie1.nom = ?
-//            """)){
-//                pst.setInt(1, categorie);
-//    }
 
     public static int createObjet(Connection con, String titre, String description,
             Timestamp debut, Timestamp fin, int prixbase, int categorie, int proposepar)
@@ -1178,14 +1170,14 @@ retournés grâce à leur description */
             if (nom == null || prenom == null || email == null) {
                 System.out.println("Veuillez remplir tous les champs.");
             } else {
-            createUtilisateur(con, nom, prenom, email, pass, codepostal);
-        login2(con, email, pass);
-        System.out.println("Nouvel utilisateur inscrit");
+                createUtilisateur(con, nom, prenom, email, pass, codepostal);
+                login2(con, email, pass);
+                System.out.println("Nouvel utilisateur inscrit");
             }
         } catch (SQLException | EmailExisteDejaException ex) {
             throw ex;
         }
-        
+
     }
 
     public static void toutRecreer(Connection con) throws SQLException {
@@ -1236,7 +1228,7 @@ retournés grâce à leur description */
                 20000, 6, 4);
         createObjet(con, "Cales-porte bretzel", "Lot de 20 cales-porte "
                 + "bretzel de différents coloris. \nMatière : PP ou PP chargé bois à 30%.",
-                convert(GetDate(-8)),convert(GetDate(16)),
+                convert(GetDate(-8)), convert(GetDate(16)),
                 2500, 8, 6);
 
         createEnchere2(con, 2, 2, convert(GetDate(-15)), 11000);
@@ -1305,8 +1297,7 @@ retournés grâce à leur description */
                     String pass = Console.entreeString("pass : ");
                     login2(con, email, pass);
                     ok = true;
-                }
-                else if (rep == 2) {
+                } else if (rep == 2) {
                     con = defautConnect();
                     inscription(con);
                     ok = true;
@@ -1316,8 +1307,8 @@ retournés grâce à leur description */
                 } else {
                     System.out.println("Problème");
                 }
-            } catch (SQLException | ClassNotFoundException | 
-                    EmailExisteDejaException ex) {
+            } catch (SQLException | ClassNotFoundException
+                    | EmailExisteDejaException ex) {
                 System.out.println("Problem : " + ex.getLocalizedMessage());
             }
 
@@ -1362,7 +1353,8 @@ retournés grâce à leur description */
 //            toutRecreer(con);
 //            afficheProfil(con);
 //            afficheVentesEnCours(con);
-        menuLogin();
+            Categorie.getIdCatFromNom(con, "Meuble");
+//            menuLogin();
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ProjetS5Encheres.class
