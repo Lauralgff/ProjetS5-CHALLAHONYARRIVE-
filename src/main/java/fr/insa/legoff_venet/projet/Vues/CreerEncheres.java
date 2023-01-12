@@ -4,6 +4,7 @@
  */
 package fr.insa.legoff_venet.projet.Vues;
 
+import com.nimbusds.jose.shaded.asm.ConvertDate;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -21,9 +22,12 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import fr.insa.legoff_venet.projet.VuePrincipale;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import fr.insa.legoff_venet.projet.projets5encheres.ProjetS5Encheres;
 
 
 /**
@@ -48,7 +52,7 @@ public class CreerEncheres extends MyVerticalLayout {
     private TextArea description;
     private DatePicker date;
     private TimePicker to;
-//    private ComboBox<String> ChoixCat;
+    private ComboBox<String> ChoixCat;
     
     public CreerEncheres(VuePrincipale main) {
 
@@ -63,17 +67,17 @@ public class CreerEncheres extends MyVerticalLayout {
         description.setLabel("Description");   
         date = new DatePicker("Date de fin");
         to = new TimePicker("Heure de fin");
-        RechercheCat = new ComboBox<>("Catégories");
-        RechercheCat.setAllowCustomValue(true);
-        RechercheCat.addCustomValueSetListener(e -> {
+        ChoixCat = new ComboBox<>("Catégories");
+        ChoixCat.setAllowCustomValue(true);
+        ChoixCat.addCustomValueSetListener(e -> {
             String customValue = e.getDetail();
             items.add(customValue);
-            RechercheCat.setItems(items);
-            RechercheCat.setValue(customValue);
+            ChoixCat.setItems(items);
+            ChoixCat.setValue(customValue);
         });
 
         FormLayout formLayout = new FormLayout();
-        formLayout.add(title, prix, RechercheCat, description, date,  to);
+        formLayout.add(title, prix, ChoixCat, description, date,  to);
         formLayout.setColspan(description, 3);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1),
                 new FormLayout.ResponsiveStep("500px", 2));
@@ -143,7 +147,8 @@ public class CreerEncheres extends MyVerticalLayout {
         String titre = this.title.getValue();
         int prix = Integer.parseInt(this.prix.getValue());
         String description = this.description.getValue();
-        
+        String categorie = this.ChoixCat.getValue();
+        Date date = ConvertDate.convertToDate(this.date.getValue());
     }
     
 }
