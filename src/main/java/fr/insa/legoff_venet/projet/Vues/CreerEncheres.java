@@ -65,7 +65,7 @@ public class CreerEncheres extends MyVerticalLayout {
         this.add(new H1("Créez votre enchère !"));
         title = new TextField("Titre *");
         prix = new TextField("Prix de départ *");
-        prix.setSuffixComponent(new Span("cts"));
+        prix.setSuffixComponent(new Span("€"));
         description = new TextArea();
         description.setWidthFull();
         description.setLabel("Description");

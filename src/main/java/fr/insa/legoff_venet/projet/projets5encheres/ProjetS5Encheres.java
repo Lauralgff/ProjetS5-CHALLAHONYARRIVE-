@@ -719,10 +719,28 @@ public class ProjetS5Encheres {
     public static List<Objet> listeObjets(Connection con) throws SQLException {
         List<Objet> res = new ArrayList<>();
         try ( PreparedStatement pst = con.prepareStatement(
-                "select objet1.id as objid,titre,description,debut,fin,prixbase,categorie,proposepar"
-                + "from objet1"
-                + "join utilisateur1 on objet1.proposepar = utilisateur1.id"
+                "select objet1.id as objid,titre,description,debut,fin,prixbase,categorie,proposepar "
+                + "from objet1 "
+                + "join utilisateur1 on objet1.proposepar = utilisateur1.id "
                 + "order by titre asc")) {
+            try ( ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    res.add(new Objet(rs.getInt("objid"), rs.getString("titre"),
+                            rs.getString("description"), rs.getTimestamp("debut"),
+                            rs.getTimestamp("fin"), rs.getInt("prixbase"),
+                            rs.getInt("categorie"), rs.getInt("proposepar")));
+                }
+            }
+        }
+        return res;
+    }
+
+    public static List<Objet> ventesEnCours(Connection con) throws SQLException {
+        List<Objet> res = new ArrayList<>();
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select * from objet1 where fin <= ? "
+                + "order by debut asc")) {
+            pst.setTimestamp(1, convert(GetDate(System.currentTimeMillis())));
             try ( ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     res.add(new Objet(rs.getInt("objid"), rs.getString("titre"),
@@ -738,9 +756,9 @@ public class ProjetS5Encheres {
     public static List<Enchere> listeEncheres(Connection con) throws SQLException {
         List<Enchere> res = new ArrayList<>();
         try ( PreparedStatement pst = con.prepareStatement(
-                "select enchere1.id as enchereid,de,sur,quand,montant from enchere1"
-                + "join utilisateur1 on enchere1.de = utilisateur1.id"
-                + "join objet1 on enchere1.sur = objet1.id"
+                "select enchere1.id as enchereid,de,sur,quand,montant from enchere1 "
+                + "join utilisateur1 on enchere1.de = utilisateur1.id "
+                + "join objet1 on enchere1.sur = objet1.id "
                 + "order by quand desc")) {
             try ( ResultSet rs = pst.executeQuery()) {
                 res.add(new Enchere(rs.getInt("enchereid"), rs.getInt("de"),

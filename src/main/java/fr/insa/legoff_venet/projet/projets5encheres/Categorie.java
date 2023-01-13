@@ -57,4 +57,22 @@ public class Categorie {
         return id;
     }
     
+    public static int getNomCatFromId(Connection con, int id) throws SQLException {
+        String nom = null;
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+            select categorie1.nom from categorie1 where categorie1.id = ?
+            """)) {
+            pst.setInt(1, id);
+            try ( ResultSet rs = pst.executeQuery()) {
+                rs.next();
+                nom = rs.getString("nom");
+            }
+        } catch (SQLException ex) {
+            throw ex;
+        }
+        System.out.println(id);
+        return id;
+    }
+    
 }
