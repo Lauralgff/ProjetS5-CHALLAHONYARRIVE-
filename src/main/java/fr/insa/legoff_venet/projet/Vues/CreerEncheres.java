@@ -23,6 +23,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import fr.insa.legoff_venet.projet.VuePrincipale;
 import fr.insa.legoff_venet.projet.projets5encheres.Categorie;
+import fr.insa.legoff_venet.projet.projets5encheres.Objet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -41,7 +42,7 @@ public class CreerEncheres extends MyVerticalLayout {
 
     private VuePrincipale main;
     private List<String> items = new ArrayList<>(
-            Arrays.asList("Meubles", "Habits", "Sport"));
+            Arrays.asList("Meuble", "Habits", "Sport"));
     public TextField textfield = new TextField();
     public ComboBox<String> RechercheCat = new ComboBox<>();
     Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
@@ -78,6 +79,7 @@ public class CreerEncheres extends MyVerticalLayout {
             ChoixCat.setItems(items);
             ChoixCat.setValue(customValue);
         });
+        ChoixCat.setItems(items);
 
         FormLayout formLayout = new FormLayout();
         formLayout.add(title, prix, ChoixCat, description, date, to);
@@ -134,13 +136,13 @@ public class CreerEncheres extends MyVerticalLayout {
             doCreerEnchere();
             valider.setEnabled(false);
 
-            Notification notification = Notification
-                    .show("Enchère ajoutée :)");
-            notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
-            notification.setPosition(Notification.Position.MIDDLE);
-
-            notification
-                    .addDetachListener(detachEvent -> valider.setEnabled(true));
+//            Notification notification = Notification
+//                    .show("Enchère ajoutée :)");
+//            notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
+//            notification.setPosition(Notification.Position.MIDDLE);
+//
+//            notification
+//                    .addDetachListener(detachEvent -> valider.setEnabled(true));
         });
 
         add(valider, home);
@@ -149,15 +151,12 @@ public class CreerEncheres extends MyVerticalLayout {
     public void doCreerEnchere() {
         Connection con = this.main.getSessionInfo().getCon();
         String titre = this.title.getValue();
-        int prixbase = Integer.parseInt(this.prix.getValue());
+//        int prixbase = Integer.parseInt(this.prix.getValue());
+        String prixbaseS = this.prix.getValue();
         String descript = this.description.getValue();
-        Date dateFin = ConvertDate.convertToDate(this.date.getValue());
-        Date heure = ConvertDate.convertToDate(this.to.getValue());
-        dateFin = ProjetS5Encheres.convertToDateUsingInstant(this.date.getValue());
-        // TODO : régler le problème des dates
-//        LocalDate dateFin = this.date.getValue();
-//        LocalTime heure = this.to.getValue();
-        long dateMillis = dateFin.getTime() + heure.getTime();
+//        Date dateFin = ConvertDate.convertToDate(this.date.getValue());
+        Date dateFin = ProjetS5Encheres.convertToDateUsingInstant(this.date.getValue());
+        long dateMillis = dateFin.getTime();
 //        long dateMillis = dateFin.get
         Timestamp fin = new Timestamp(dateMillis);
         int proposepar = this.main.getSessionInfo().getUserId();
@@ -165,11 +164,11 @@ public class CreerEncheres extends MyVerticalLayout {
         if (dateMillis <= System.currentTimeMillis()) {
             Notification.show("La date de fin de l'enchère doit être "
                     + "ultérieure à la date actuelle.");
-        } else if (titre.isBlank() || prixbase == 0 || dateMillis == 0 
-                || dateFin == null || heure == null) {
+        } else if (titre.isBlank() || prixbaseS.isBlank() || dateMillis == 0) {
             Notification.show("Les champs * doivent tous être remplis.");
         } else {
             try {
+                int prixbase = Integer.parseInt(prixbaseS);
                 categorie = Categorie.getIdCatFromNom(con, this.ChoixCat.getValue());
                 if (categorie == 0) {
                     Notification.show("Les champs * doivent tous être remplis.");
@@ -178,7 +177,11 @@ public class CreerEncheres extends MyVerticalLayout {
                         new Timestamp(System.currentTimeMillis()), fin,
                         prixbase, categorie, proposepar);
                 this.main.setMainContent(new PageAccueilSite(this.main));
-                Notification.show("Vente créée! id de l'objet : ");
+                this.main.entete.removeAll();
+                this.main.entete.add(Profil, AVendre, textfield, 
+                        RechercheCat, Deconnexion);
+                Notification.show("Vente créée! id de l'objet : " 
+                        + Objet.getIdObjetFromTitre(con, titre));
                 }
             } catch (SQLException ex) {
                 Notification.show("Problème interne : " + ex.getLocalizedMessage());

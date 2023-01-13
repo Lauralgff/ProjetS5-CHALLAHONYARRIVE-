@@ -4,6 +4,10 @@
  */
 package fr.insa.legoff_venet.projet.projets5encheres;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
@@ -11,7 +15,7 @@ import java.sql.Timestamp;
  * @author i5e330
  */
 public class Objet {
-    
+
     private int id;
     private String titre;
     private String description;
@@ -20,8 +24,8 @@ public class Objet {
     private int prixbase;
     private int categorie;
     private int proposepar;
-    
-    public Objet (int id, String titre, String description, Timestamp debut,
+
+    public Objet(int id, String titre, String description, Timestamp debut,
             Timestamp fin, int prixbase, int categorie, int proposepar) {
         this.id = id;
         this.titre = titre;
@@ -96,7 +100,24 @@ public class Objet {
     public void setProposepar(int proposepar) {
         this.proposepar = proposepar;
     }
-    
-    
-    
+
+    public static int getIdObjetFromTitre(Connection con, String titre)
+            throws SQLException {
+        int id = 0;
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+            select objet1.id from objet1 where objet1.titre = ?
+            """)) {
+            pst.setString(1, titre);
+            try ( ResultSet rs = pst.executeQuery()) {
+                rs.next();
+                id = rs.getInt("id");
+            }
+        } catch (SQLException ex) {
+            throw ex;
+        }
+        System.out.println(id);
+        return id;
+    }
+
 }
