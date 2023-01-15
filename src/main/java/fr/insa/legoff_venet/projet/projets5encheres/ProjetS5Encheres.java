@@ -818,8 +818,8 @@ public class ProjetS5Encheres {
     
     public static List<Objet> mesEncheres(Connection con, int idU) throws SQLException {
         List<Objet> res = new ArrayList<>();
-        try ( PreparedStatement pst = con.prepareStatement(
-                "select *,(select max(montant) from enchere1 where sur = objet1.id) as mMax,"
+        try ( PreparedStatement pst = con.prepareStatement("select *,"
+                + "(select max(montant) from enchere1 where sur = objet1.id) as mMax,"
                 + "(select de from enchere1 where sur = objet1.id and montant = ("
                 + "select max(montant) from enchere1 where sur = objet1.id)) as idDe,"
                 + "(select utilisateur1.nom from enchere1 "
@@ -829,7 +829,7 @@ public class ProjetS5Encheres {
                 + "categorie1.nom as nomCat from objet1 "
                 + "join categorie1 on categorie1.id = objet1.categorie "
                 + "where exists(select enchere1.sur from enchere1 "
-                + "where enchere1.sur = objet1.id and enchere1.de = ?")) {
+                + "where enchere1.sur = objet1.id and enchere1.de = ?)")) {
             pst.setInt(1, idU);
             try ( ResultSet tlu = pst.executeQuery()) {
                 while (tlu.next()) {
@@ -1035,11 +1035,8 @@ public class ProjetS5Encheres {
                 + "join utilisateur1 on utilisateur1.id = enchere1.de "
                 + "where sur = objet1.id and montant = ("
                 + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe,"
-                //                    + "(select utilisateur1.id as idUtil from enchere1 "
-                //                    + "join utilisateur1 on enchere1.de = utilisateur1.id) as idU,"
-                + ",categorie1.nom as nomCat from objet1 "
+                + "categorie1.nom as nomCat from objet1 "
                 + "join categorie1 on categorie1.id = objet1.categorie "
-                //                    + "where exists (select de from enchere1 where enchere1.de = utilisateur1.id) "
                 + "where exists(select enchere1.sur from enchere1 "
                 + "where enchere1.sur = objet1.id and enchere1.de = ?)")) {
             pst.setInt(1, idU);
@@ -1257,6 +1254,51 @@ retournés grâce à leur description */
                 + "from objet1 "
                 + "join categorie1 on categorie1.id = objet1.categorie "
                 + "where titre like ? or description like ?")) {
+            pst.setString(1, finalSearch);
+            pst.setString(2, finalSearch);
+            try ( ResultSet tlu = pst.executeQuery()) {
+//                System.out.println("Résultats obtenus : \n"
+//                        + "--------------------");
+                while (tlu.next()) {
+                    int id = tlu.getInt("id");
+                    String titre = tlu.getString("titre");
+                    String description = tlu.getString("description");
+                    Timestamp debut = tlu.getTimestamp("debut");
+                    Timestamp fin = tlu.getTimestamp("fin");
+                    int prixbase = tlu.getInt("prixbase");
+                    int mMax = tlu.getInt("mMax");
+                    if (mMax == 0) {
+                        mMax = prixbase;
+                    }
+                    int proposepar = tlu.getInt("proposepar");
+                    int categorie = tlu.getInt("categorie");
+                    String nomCat = tlu.getString("nomCat");
+                    String nomDe = tlu.getString("nomDe");
+                    String close = null;
+                    int idDe = 0;
+                    res.add(new Objet(id, titre, description, debut, fin,
+                            prixbase, categorie, proposepar, mMax, nomCat, 
+                            close, idDe, nomDe));
+                }
+            }
+        }
+        return res;
+    }
+    
+    public static List<Objet> objetsRechercheCat(Connection con, String search)
+            throws SQLException {
+        String finalSearch = "%" + search + "%";
+        List<Objet> res = new ArrayList();
+        try ( PreparedStatement pst = con.prepareStatement("select *,"
+                + "(select max(montant) from enchere1 where sur = objet1.id) as mMax,"
+                + "categorie1.nom as nomCat,"
+                + "(select utilisateur1.nom from enchere1 "
+                + "join utilisateur1 on utilisateur1.id = enchere1.de "
+                + "where sur = objet1.id and montant = ("
+                + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe "
+                + "from objet1 "
+                + "join categorie1 on categorie1.id = objet1.categorie "
+                + "where categorie like ?")) {
             pst.setString(1, finalSearch);
             pst.setString(2, finalSearch);
             try ( ResultSet tlu = pst.executeQuery()) {
@@ -1514,8 +1556,8 @@ retournés grâce à leur description */
 //            createCategorie(con);
 //            System.out.println("Catégorie créée");
 //            demandeEnchere(con);
-//            bilanEncheres(con);
-            bilanVentes(con);
+            bilanEncheres(con);
+//            bilanVentes(con);
 //            recherche(con);
 //            String email = Console.entreeString("Email : ");
 //            String pass = Console.entreeString("pass : ");
