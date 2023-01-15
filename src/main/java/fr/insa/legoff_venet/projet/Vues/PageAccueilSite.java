@@ -13,14 +13,14 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import fr.insa.legoff_venet.projet.VuePrincipale;
-import fr.insa.legoff_venet.projet.projets5encheres.Categorie;
 import fr.insa.legoff_venet.projet.projets5encheres.Objet;
 import fr.insa.legoff_venet.projet.projets5encheres.ProjetS5Encheres;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,19 +35,21 @@ public class PageAccueilSite extends MyVerticalLayout {
     private List<String> items = new ArrayList<>();
     public TextField ResearchBar = new TextField();
     public ComboBox<String> RechercheCat = new ComboBox<>();
-    Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
+    public Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
     public Button Profil = new Button("Mon profil", new Icon(VaadinIcon.USER));
     public Button AVendre = new Button("Vendre", new Icon(VaadinIcon.WALLET));
+    public Button ActRechercheText = new Button ("Rechercher", new Icon(VaadinIcon.SEARCH));
+    public Button ActRechercheCat = new Button ("Rechercher par catégorie", new Icon(VaadinIcon.SEARCH));
+    private Grid<Objet> tableau;
+    
 
     public PageAccueilSite(VuePrincipale main) {
 
         
         this.main = main;
-
-        //Barre de recherche textuelle
-        this.ResearchBar.setPlaceholder("Search");
-        this.ResearchBar.setPrefixComponent(VaadinIcon.SEARCH.create());
-
+        
+        
+        
         //Bouton de deconnexion, retour à la page d'accueil      
         this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
         this.Deconnexion.addClickListener((event) -> {
@@ -69,9 +71,33 @@ public class PageAccueilSite extends MyVerticalLayout {
             this.main.entete.remove(ResearchBar, RechercheCat);
         });
 
-        this.main.entete.add(Profil, AVendre, ResearchBar, RechercheCat, Deconnexion);
+        this.main.entete.add(Profil, AVendre);
         
         Connection con = this.main.getSessionInfo().getCon();
+        
+        //Barre de recherche textuelle
+        this.ResearchBar.setPlaceholder("Search");
+        this.ResearchBar.setPrefixComponent(VaadinIcon.SEARCH.create());
+        
+        this.ActRechercheText.addClickListener((e) -> {
+            this.main.mainContent.removeAll();
+            String motcle = ResearchBar.getValue(); 
+            this.tableau = new Grid<>(Objet.class, false);
+            this.tableau.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
+            this.tableau.addColumn(Objet::getDescription).setHeader("Description");
+            this.tableau.addColumn(Objet::getPrixbase).setHeader("Prix de départ €");
+            this.tableau.addColumn(Objet::getmMax).setHeader("Dernière enchère");
+            this.tableau.addColumn(Objet::getFin).setHeader("Fin de l'enchère");
+            this.tableau.addColumn(Objet::getNomCat).setHeader("Catégorie");
+            List<Objet> listeobjet;
+            try {
+                listeobjet = ProjetS5Encheres.objetsRecherche(con, motcle);
+                this.tableau.setItems(listeobjet);
+            } catch (SQLException ex) {
+                Logger.getLogger(AfficheProfil.class.getName()).log(Level.SEVERE, null, ex);
+            }       
+            this.main.mainContent.add(this.tableau);
+        });
         
         //Barre de recherche par catégories
         this.RechercheCat.setAllowCustomValue(true);
@@ -88,6 +114,31 @@ public class PageAccueilSite extends MyVerticalLayout {
             RechercheCat.setValue(customValue);
         });
         RechercheCat.setItems(items);
+        
+        this.ActRechercheCat.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        this.ActRechercheCat.addClickListener((e) -> {
+            this.main.mainContent.removeAll();
+            
+            String categorie = RechercheCat.getValue();
+            this.tableau = new Grid<>(Objet.class, false);
+            this.tableau.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
+            this.tableau.addColumn(Objet::getDescription).setHeader("Description");
+            this.tableau.addColumn(Objet::getPrixbase).setHeader("Prix de départ €");
+            this.tableau.addColumn(Objet::getmMax).setHeader("Dernière enchère");
+            this.tableau.addColumn(Objet::getFin).setHeader("Fin de l'enchère");
+            this.tableau.addColumn(Objet::getNomCat).setHeader("Catégorie");
+            List<Objet> listeobjet;
+            try {
+                listeobjet = ProjetS5Encheres.objetsRechercheCat (con, categorie);
+                this.tableau.setItems(listeobjet);
+            } catch (SQLException ex) {
+                Logger.getLogger(AfficheProfil.class.getName()).log(Level.SEVERE, null, ex);
+            }       
+            this.main.mainContent.add(this.tableau);
+        });
+        
+        this.main.entete.add(ResearchBar, ActRechercheText,RechercheCat,ActRechercheCat);
+        
         
         Grid<Objet> TabObjet = new Grid<>(Objet.class, false);
         TabObjet.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
