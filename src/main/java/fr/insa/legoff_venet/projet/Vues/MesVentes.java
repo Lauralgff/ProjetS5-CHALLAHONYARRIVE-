@@ -50,10 +50,12 @@ public class MesVentes extends MyVerticalLayout {
     Connection con = this.main.getSessionInfo().getCon();
     int id = this.main.getSessionInfo().getUserId();
         Grid<Objet> TabObjet = new Grid<>(Objet.class, false);
+        TabObjet.addColumn(Objet::getId).setHeader("Id");
         TabObjet.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
         TabObjet.addColumn(Objet::getDescription).setHeader("Description");
         TabObjet.addColumn(Objet::getPrixbase).setHeader("Prix de départ €");
         TabObjet.addColumn(Objet::getmMax).setHeader("Dernière enchère");
+        TabObjet.addColumn(Objet::getNomDe).setHeader("Dernier enchérisseur");
         TabObjet.addColumn(Objet::getFin).setHeader("Fin de l'enchère");
         TabObjet.addColumn(Objet::getNomCat).setHeader("Catégorie");
         TabObjet.addColumn(Objet::getClose).setHeader("Statut");

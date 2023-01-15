@@ -45,14 +45,6 @@ public class Inscription extends MyVerticalLayout {
     this.main = main;
     
         this.add(new H1("Inscription"));
-    
-//        TextField firstName = new TextField("Prénom");
-//        TextField lastName = new TextField("Nom");
-//        TextField email = new TextField("Email");
-//        TextField postCode = new TextField("Code Postal");
-//        
-//        PasswordField password = new PasswordField("Password");
-//        PasswordField confirmPassword = new PasswordField("Confirm password");
         
         this.firstName = new TextField("Prénom");
         this.lastName = new TextField("Nom");
@@ -75,8 +67,8 @@ public class Inscription extends MyVerticalLayout {
         valider.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
         this.add(firstName,lastName, email, postCode, password,confirmPassword,valider, retour);
         valider.addClickListener((event) -> {
-//            doSignUp();
-            this.main.setMainContent(new PageAccueilSite(this.main));   
+            doSignUp();
+//            this.main.setMainContent(new PageAccueilSite(this.main));   
          });
         retour.addThemeVariants(ButtonVariant.LUMO_ERROR);
         retour.addClickListener((event) -> {
