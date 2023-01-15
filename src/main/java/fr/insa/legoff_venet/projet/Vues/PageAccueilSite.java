@@ -32,9 +32,7 @@ import java.util.logging.Logger;
 public class PageAccueilSite extends MyVerticalLayout {
 
     public VuePrincipale main;
-//    private List<String> items = new ArrayList<>(
-//            Arrays.asList("Vêtements", "Meubles", "Animaux", "Sport", 
-//                    "Jeux/Jouets", "Automobile", "Bricolage", "Décoration"));
+    
     private List<String> items = new ArrayList<>();
     public TextField ResearchBar = new TextField();
     public ComboBox<String> RechercheCat = new ComboBox<>();
@@ -44,7 +42,6 @@ public class PageAccueilSite extends MyVerticalLayout {
     public Button ActRechercheText = new Button("Rechercher", new Icon(VaadinIcon.SEARCH));
     public Button ActRechercheCat = new Button("Rechercher par catégorie", new Icon(VaadinIcon.SEARCH));
     private Grid<Objet> tableau;
-
     private Dialog dialog;
     private Button saveButton;
     private Button cancelButton;
@@ -68,8 +65,6 @@ public class PageAccueilSite extends MyVerticalLayout {
         this.Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         this.Profil.addClickListener((event) -> {
             this.main.setMainContent(new AfficheProfil(this.main));
-            /*this.main.entete.remove(ResearchBar, RechercheCat,
-                    ActRechercheCat, ActRechercheText);*/
             this.main.entete.removeAll();
         });
 
@@ -81,8 +76,6 @@ public class PageAccueilSite extends MyVerticalLayout {
             } catch (SQLException ex) {
                 Logger.getLogger(PageAccueilSite.class.getName()).log(Level.SEVERE, null, ex);
             }
-            /*this.main.entete.remove(ResearchBar, RechercheCat,
-                ActRechercheCat, ActRechercheText);*/
             this.main.entete.removeAll();
         });
 
@@ -94,6 +87,7 @@ public class PageAccueilSite extends MyVerticalLayout {
         this.ResearchBar.setPlaceholder("Search");
         this.ResearchBar.setPrefixComponent(VaadinIcon.SEARCH.create());
 
+        //Bouton de Recherche textuelle
         this.ActRechercheText.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         this.ActRechercheText.addClickListener((e) -> {
             this.main.mainContent.removeAll();
@@ -135,6 +129,7 @@ public class PageAccueilSite extends MyVerticalLayout {
         });
         RechercheCat.setItems(items);
 
+        //Bouton d'activation de recherche par catégorie
         this.ActRechercheCat.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         this.ActRechercheCat.addClickListener((e) -> {
             this.main.mainContent.removeAll();
@@ -162,19 +157,10 @@ public class PageAccueilSite extends MyVerticalLayout {
 
         });
 
-        this.main.entete.add(ResearchBar, ActRechercheText,
-                RechercheCat, ActRechercheCat, Deconnexion);
+        this.main.entete.add(ResearchBar, ActRechercheText, RechercheCat, ActRechercheCat, Deconnexion);
 
-//------------------------ AFFICHAGE MAIN CONTENT --------------------------------     
-//      Affichage tableau objets en ventes
-//        Grid<Objet> TabObjet = new Grid<>(Objet.class, false);
-//        TabObjet.addColumn(Objet::getId).setHeader("Id");
-//        TabObjet.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
-//        TabObjet.addColumn(Objet::getDescription).setHeader("Description");
-//        TabObjet.addColumn(Objet::getPrixbase).setHeader("Prix de départ €");
-//        TabObjet.addColumn(Objet::getmMax).setHeader("Dernière enchère");
-//        TabObjet.addColumn(Objet::getFin).setHeader("Fin de l'enchère");
-//        TabObjet.addColumn(Objet::getNomCat).setHeader("Catégorie");
+//------------------------ AFFICHAGE MAIN CONTENT --------------------------------  
+
         this.tableau = new Grid<>(Objet.class, false);
         this.tableau.addColumn(Objet::getId).setHeader("Id");
         this.tableau.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
@@ -185,7 +171,6 @@ public class PageAccueilSite extends MyVerticalLayout {
         this.tableau.addColumn(Objet::getNomCat).setHeader("Catégorie");
 
         try {
-
             List<Objet> ListObjet = ProjetS5Encheres.ventesEnCours(con);
             this.tableau.setItems(ListObjet);
             this.add(this.tableau);
@@ -215,10 +200,6 @@ public class PageAccueilSite extends MyVerticalLayout {
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         dialog.getFooter().add(cancelButton);
         dialog.getFooter().add(saveButton);
-
-//        this.tableau.addItemClickListener(e
-//                -> dialog.open()
-//        );
         this.tableau.addItemClickListener(e
                 -> dialog.open()
         );
@@ -232,6 +213,8 @@ public class PageAccueilSite extends MyVerticalLayout {
         return saveButton;
     }
 
+    
+    //Méthode Encherir
     public void doEncherir() {
         String idObjetS = this.IdObj.getValue();
         String montantS = this.encherir.getValue();

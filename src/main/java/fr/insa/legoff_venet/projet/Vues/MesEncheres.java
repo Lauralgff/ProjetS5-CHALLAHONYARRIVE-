@@ -101,6 +101,8 @@ public class MesEncheres extends MyVerticalLayout {
         saveButton.addClickListener((event) -> {
             doEncherir();
         });
+        
+        //Défintion du pop up
         this.cancelButton = new Button("Cancel", e -> dialog.close());
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         dialog.getFooter().add(cancelButton);
@@ -118,6 +120,8 @@ public class MesEncheres extends MyVerticalLayout {
         return saveButton;
     }
 
+    
+//--------------------- Méthode d'insertion d'une enchère ---------------------
     public void doEncherir() {
         String idObjetS = this.IdObj.getValue();
         String montantS = this.encherir.getValue();

@@ -34,36 +34,28 @@ public class Connexion extends MyVerticalLayout{
     private Button vbRetour;
               
     public Connexion(VuePrincipale main) {
+        
+        
         this.main = main;
-//        TextField lastName = new TextField("Email");
         this.vemail = new TextField("Email");
-//        PasswordField password = new PasswordField("Password"); 
         this.vpass = new PasswordField("Password");
-//        Button login = new Button ("Connexion");
-        this.vbLogin = new Button ("Connexion");
-//        Button Retour = new Button ("Retour",new Icon(VaadinIcon.ARROW_LEFT));
-        this.vbRetour = new Button ("Retour",new Icon(VaadinIcon.ARROW_LEFT));
-//        login.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
         this.vbLogin.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
-//        this.add(lastName, password, login, Retour);
         this.add(this.vemail, this.vpass, this.vbLogin, this.vbRetour);
-//        login.addClickListener((event) -> {
-//            this.main.setMainContent(new PageAccueilSite(this.main));   
-//         });
+        
+        //Bouton valider
+        this.vbLogin = new Button ("Connexion");
         this.vbLogin.addClickListener((event) -> {
             this.doLogin();
-            System.out.println("théoriquement on est connecté");
         });
-//        Retour.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        
+        //Bouton de déconnexion
+        this.vbRetour = new Button ("Retour",new Icon(VaadinIcon.ARROW_LEFT));
         this.vbRetour.addThemeVariants(ButtonVariant.LUMO_ERROR);
-//        Retour.addClickListener((event) -> {
-//            this.main.setMainContent(new PageAccueil(this.main));   
-//         });
         this.vbRetour.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueil(this.main));
         });
     }
-    
+//-----------------------------Méthode de connexion ----------------------------
     public void doLogin() {
         String email = this.vemail.getValue();
         String pass = this.vpass.getValue();

@@ -43,7 +43,7 @@ public class ProjetS5Encheres {
 
     public static Connection defautConnect()
             throws ClassNotFoundException, SQLException {
-        return connectGeneralPostGres("localhost", 5432,
+        return connectGeneralPostGres("localhost", 5439,
                 "postgres", "postgres", "pass");
     }
 

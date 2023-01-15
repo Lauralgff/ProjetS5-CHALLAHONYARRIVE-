@@ -52,7 +52,7 @@ public class AfficheProfil extends MyVerticalLayout {
         avatar.setHeight("150px");
         avatar.setWidth("150px");
 
-        //ptete rajouter un get qqchose pour choper l'email 
+        //Recupération des données de l'utilisateur 
         Label nom = new Label(this.main.getSessionInfo().getUserNom());
         nom.getStyle().set("font-size", "20px");
         nom.getStyle().set("font-weight", "bold");
@@ -71,86 +71,7 @@ public class AfficheProfil extends MyVerticalLayout {
         postcode.getStyle().set("font-weight", "bold");
 
         add(avatar, nom, prenom, email, postcode);
-
         
-        /*Connection con = this.main.getSessionInfo().getCon();
-        
-        //Barre de recherche par catégories
-        this.RechercheCat.setAllowCustomValue(true);
-        this.RechercheCat.setPlaceholder("Rechercher par catégorie");
-        try {
-        items = ProjetS5Encheres.listeNomCat(con);
-        } catch (SQLException ex) {
-            
-        }
-        this.RechercheCat.addCustomValueSetListener(e -> {
-            String customValue = e.getDetail();
-            items.add(customValue);
-            RechercheCat.setItems(items);
-            RechercheCat.setValue(customValue);
-        });
-        RechercheCat.setItems(items);
-        
-        this.ActRechercheCat.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
-        this.ActRechercheCat.addClickListener((e) -> {
-            this.main.mainContent.removeAll();
-            
-            String categorie = RechercheCat.getValue();
-            this.tableau = new Grid<>(Objet.class, false);
-            this.tableau.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
-            this.tableau.addColumn(Objet::getDescription).setHeader("Description");
-            this.tableau.addColumn(Objet::getPrixbase).setHeader("Prix de départ €");
-            this.tableau.addColumn(Objet::getmMax).setHeader("Dernière enchère");
-            this.tableau.addColumn(Objet::getFin).setHeader("Fin de l'enchère");
-            this.tableau.addColumn(Objet::getNomCat).setHeader("Catégorie");
-            List<Objet> listeobjet;
-            try {
-                listeobjet = ProjetS5Encheres.objetsRechercheCat (con, categorie);
-                this.tableau.setItems(listeobjet);
-            } catch (SQLException ex) {
-                Logger.getLogger(AfficheProfil.class.getName()).log(Level.SEVERE, null, ex);
-            }       
-            this.main.mainContent.add(this.tableau);
-        });
-
-        //Barre de recherche textuelle
-        this.textfield.setPlaceholder("Search");
-        this.textfield.setPrefixComponent(VaadinIcon.SEARCH.create());
-        
-        this.ActRechercheText.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
-        this.ActRechercheText.addClickListener((e) -> {
-            this.main.mainContent.removeAll();
-            
-            String motcle = ResearchBar.getValue(); 
-            this.tableau = new Grid<>(Objet.class, false);
-            this.tableau.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
-            this.tableau.addColumn(Objet::getDescription).setHeader("Description");
-            this.tableau.addColumn(Objet::getPrixbase).setHeader("Prix de départ €");
-            this.tableau.addColumn(Objet::getmMax).setHeader("Dernière enchère");
-            this.tableau.addColumn(Objet::getFin).setHeader("Fin de l'enchère");
-            this.tableau.addColumn(Objet::getNomCat).setHeader("Catégorie");
-            List<Objet> listeobjet;
-            try {
-                listeobjet = ProjetS5Encheres.objetsRecherche(con, motcle);
-                this.tableau.setItems(listeobjet);
-            } catch (SQLException ex) {
-                Logger.getLogger(AfficheProfil.class.getName()).log(Level.SEVERE, null, ex);
-            }       
-            this.main.mainContent.add(this.tableau);
-        });
-
-        //Bouton profil, entete
-        this.Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
-        this.Profil.addClickListener((event) -> {
-            this.main.setMainContent(new AfficheProfil(this.main));
-        });
-
-        //Bouton Vendre, entete
-        this.AVendre.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
-        this.AVendre.addClickListener((event) -> {
-            this.main.setMainContent(new CreerEncheres(this.main));
-        });*/
-
         //Bouton d'affichage des Ventes
         Button Mesventes = new Button("Mes Ventes", new Icon(VaadinIcon.WALLET));
         Mesventes.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
@@ -165,7 +86,6 @@ public class AfficheProfil extends MyVerticalLayout {
         MesEncheres.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         MesEncheres.addClickListener((event) -> {
             this.main.setMainContent(new MesEncheres(this.main));
-            //this.main.entete.remove(ResearchBar, RechercheCat);
         });
 
         //Bouton de deconnexion, retour à la page d'accueil
@@ -180,10 +100,6 @@ public class AfficheProfil extends MyVerticalLayout {
         home.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         home.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueilSite(this.main));
-            //this.main.entete.removeAll();
-            /*this.main.entete.add(Profil, AVendre, 
-                    textfield, ActRechercheText, 
-                    RechercheCat, ActRechercheCat, Deconnexion);*/
         });
 
         add(Mesventes, MesEncheres, home, Deconnexion);

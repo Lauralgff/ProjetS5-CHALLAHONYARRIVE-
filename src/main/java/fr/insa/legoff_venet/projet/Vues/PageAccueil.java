@@ -22,20 +22,22 @@ public class PageAccueil extends MyVerticalLayout{
         this.main = main;
         
         this.add(new H1("Bienvenue"));
-        Button button = new Button("S'inscrire");
-        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
         
-        Button button1 = new Button("Se connecter");
-        button1.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        
-        button.addClickListener((event) -> {
+        //Bouton inscription
+        Button Sinscrire = new Button("S'inscrire");
+        Sinscrire.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
+        Sinscrire.addClickListener((event) -> {
          this.main.setMainContent(new Inscription(this.main));   
          });
-        button1.addClickListener((event) -> {
+        
+        //Bouton se connecter
+        Button SeConnecter = new Button("Se connecter");
+        SeConnecter.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        SeConnecter.addClickListener((event) -> {
          this.main.setMainContent(new Connexion(this.main));   
          });
-        VerticalLayout Boutton = new VerticalLayout (button, button1);
-        add (Boutton);
+        
+       add(Sinscrire, SeConnecter);
     }
      
 }

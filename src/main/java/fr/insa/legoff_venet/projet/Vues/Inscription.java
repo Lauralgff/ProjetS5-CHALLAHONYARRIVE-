@@ -36,7 +36,6 @@ public class Inscription extends MyVerticalLayout {
     private TextField postCode;
     private PasswordField password;
     private PasswordField confirmPassword;
-    
     private Button valider;
     private Button retour;
     
@@ -57,25 +56,29 @@ public class Inscription extends MyVerticalLayout {
 //        Button valider = new Button("Valider");
         this.valider = new Button("Valider");
         valider.setEnabled(false);
+        valider.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
+        valider.addClickListener((event) -> {
+            doSignUp();   
+         });
+        
         //activer le bouton valider
         confirmPassword.addInputListener(event ->  {
             valider.setEnabled(true);
         });
-//        Button Retour = new Button ("Retour",new Icon(VaadinIcon.ARROW_LEFT));
-        this.retour = new Button ("Retour", new Icon(VaadinIcon.ARROW_LEFT));
         
-        valider.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
-        this.add(firstName,lastName, email, postCode, password,confirmPassword,valider, retour);
-        valider.addClickListener((event) -> {
-            doSignUp();
-//            this.main.setMainContent(new PageAccueilSite(this.main));   
-         });
+        //Bouton de retour à la page d'accueil
+        this.retour = new Button ("Retour", new Icon(VaadinIcon.ARROW_LEFT));
         retour.addThemeVariants(ButtonVariant.LUMO_ERROR);
         retour.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueil(this.main));   
          });
+        
+        this.add(firstName,lastName, email, postCode, password,confirmPassword,valider, retour);
+        
+    
     }
     
+//------------------------- Méthode d'inscription -----------------------------------   
     public void doSignUp() {
         String nom = this.lastName.getValue();
         String prenom = this.firstName.getValue();
