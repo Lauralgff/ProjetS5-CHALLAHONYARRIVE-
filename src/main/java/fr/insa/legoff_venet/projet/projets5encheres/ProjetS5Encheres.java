@@ -715,16 +715,15 @@ public class ProjetS5Encheres {
             }
         }
     }
-    
+
     public static List<String> listeNomCat(Connection con) throws SQLException {
         List<String> res = new ArrayList<>();
         try ( PreparedStatement pst = con.prepareStatement(
-        "select nom from categorie1")) {
+                "select nom from categorie1")) {
             try ( ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     String nom = rs.getString("nom");
                     res.add(nom);
-                    System.out.println(nom);
                 }
             }
         }
@@ -777,7 +776,7 @@ public class ProjetS5Encheres {
                     String nomDe = null;
 //                    System.out.println("mMax " + mMax + ", nomCat " + nomCat);
                     res.add(new Objet(id, titre, description, debut, fin,
-                            prixbase, categorie, proposepar, mMax, nomCat, 
+                            prixbase, categorie, proposepar, mMax, nomCat,
                             close, idDe, nomDe));
 
                 }
@@ -798,7 +797,8 @@ public class ProjetS5Encheres {
                 + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe,"
                 + "objet1.categorie,categorie1.nom as nomCat,prixbase,debut,fin from objet1 "
                 + "join categorie1 on categorie1.id = objet1.categorie "
-                + "where objet1.proposepar = ?")) {
+                + "where objet1.proposepar = ? "
+                + "order by debut desc")) {
             pst.setInt(1, idU);
             try ( ResultSet tlu = pst.executeQuery()) {
                 while (tlu.next()) {
@@ -819,10 +819,10 @@ public class ProjetS5Encheres {
                     if (finMillis < System.currentTimeMillis()) {
                         close = "ENCHERE CLOSE\n";
                     } else {
-                        close = " ";
+                        close = "En cours";
                     }
                     res.add(new Objet(id, titre, description, debut, fin,
-                            prixbase, categorie, proposepar, mMax, nomCat, 
+                            prixbase, categorie, proposepar, mMax, nomCat,
                             close, idDe, nomDe));
                 }
             }
@@ -830,7 +830,7 @@ public class ProjetS5Encheres {
         }
         return res;
     }
-    
+
     public static List<Objet> mesEncheres(Connection con, int idU) throws SQLException {
         List<Objet> res = new ArrayList<>();
         try ( PreparedStatement pst = con.prepareStatement("select *,"
@@ -844,7 +844,8 @@ public class ProjetS5Encheres {
                 + "categorie1.nom as nomCat from objet1 "
                 + "join categorie1 on categorie1.id = objet1.categorie "
                 + "where exists(select enchere1.sur from enchere1 "
-                + "where enchere1.sur = objet1.id and enchere1.de = ?)")) {
+                + "where enchere1.sur = objet1.id and enchere1.de = ?) "
+                + "order by debut desc")) {
             pst.setInt(1, idU);
             try ( ResultSet tlu = pst.executeQuery()) {
                 while (tlu.next()) {
@@ -865,10 +866,10 @@ public class ProjetS5Encheres {
                     if (finMillis < System.currentTimeMillis()) {
                         close = "ENCHERE CLOSE\n";
                     } else {
-                        close = " ";
+                        close = "En cours";
                     }
                     res.add(new Objet(id, titre, description, debut, fin,
-                            prixbase, categorie, proposepar, mMax, nomCat, 
+                            prixbase, categorie, proposepar, mMax, nomCat,
                             close, idDe, nomDe));
                 }
             }
@@ -1254,7 +1255,7 @@ retournés grâce à leur description */
 //            }
 //        }
     }
-    
+
     public static List<Objet> objetsRecherche(Connection con, String search)
             throws SQLException {
         String finalSearch = "%" + search + "%";
@@ -1268,7 +1269,8 @@ retournés grâce à leur description */
                 + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe "
                 + "from objet1 "
                 + "join categorie1 on categorie1.id = objet1.categorie "
-                + "where titre like ? or description like ?")) {
+                + "where titre like ? or description like ? "
+                + "order by debut desc")) {
             pst.setString(1, finalSearch);
             pst.setString(2, finalSearch);
             try ( ResultSet tlu = pst.executeQuery()) {
@@ -1289,18 +1291,20 @@ retournés grâce à leur description */
                     String nomDe = tlu.getString("nomDe");
                     String close = null;
                     int idDe = 0;
-                    res.add(new Objet(id, titre, description, debut, fin,
-                            prixbase, categorie, proposepar, mMax, nomCat, 
+                    if (fin.getTime() >= System.currentTimeMillis()) {
+                        res.add(new Objet(id, titre, description, debut, fin,
+                            prixbase, categorie, proposepar, mMax, nomCat,
                             close, idDe, nomDe));
+                    }
                 }
             }
         }
         return res;
     }
-    
+
     public static List<Objet> objetsRechercheCat(Connection con, String search)
             throws SQLException {
-        String finalSearch = "%" + search + "%";
+//        String finalSearch = "'" + search + "'";
         List<Objet> res = new ArrayList();
         try ( PreparedStatement pst = con.prepareStatement("select *,"
                 + "(select max(montant) from enchere1 where sur = objet1.id) as mMax,"
@@ -1311,9 +1315,8 @@ retournés grâce à leur description */
                 + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe "
                 + "from objet1 "
                 + "join categorie1 on categorie1.id = objet1.categorie "
-                + "where nomCat like ?")) {
-            pst.setString(1, finalSearch);
-            pst.setString(2, finalSearch);
+                + "order by debut desc")) {
+            pst.setString(1, search);
             try ( ResultSet tlu = pst.executeQuery()) {
 //                System.out.println("Résultats obtenus : \n"
 //                        + "--------------------");
@@ -1334,9 +1337,11 @@ retournés grâce à leur description */
                     String nomDe = tlu.getString("nomDe");
                     String close = null;
                     int idDe = 0;
+                    if (fin.getTime() >= System.currentTimeMillis()) {
                     res.add(new Objet(id, titre, description, debut, fin,
-                            prixbase, categorie, proposepar, mMax, nomCat, 
+                            prixbase, categorie, proposepar, mMax, nomCat,
                             close, idDe, nomDe));
+                    }
                 }
             }
         }
@@ -1425,6 +1430,8 @@ retournés grâce à leur description */
                     "mdr@email.com", "12345", "01240"));
             idu.add(createUtilisateur(con, "Talent", "Billy",
                     "billy@email.com", "leaves", "45000"));
+            idu.add(createUtilisateur(con, "Colucci", "Michel",
+                    "enfoire@email.com", "banzai", "32000"));
         } catch (EmailExisteDejaException ex) {
             throw new Error(ex);
         }
@@ -1455,7 +1462,7 @@ retournés grâce à leur description */
         createObjet(con, "Cales-porte bretzel", "Lot de 20 cales-porte "
                 + "bretzel de différents coloris. \nMatière : PP ou PP chargé bois à 30%.",
                 convert(GetDate(-8)), convert(GetDate(16)),
-                2500, 8, 6);
+                2500, 8, 5);
 
         createEnchere2(con, 2, 2, convert(GetDate(-15)), 11000);
         createEnchere2(con, 4, 2, convert(GetDate(-5)), 12000);
@@ -1576,12 +1583,12 @@ retournés grâce à leur description */
 //            System.out.println("Utilisateur connecté");
 //            demandeUtilisateur(con);
 //            menuPrincipal(con);
-//            toutRecreer(con);
+            toutRecreer(con);
 //            afficheProfil(con);
 //            afficheVentesEnCours(con);
 //            Categorie.getIdCatFromNom(con, "Meuble");
 //            System.out.println(ventesEnCours(con));
-            listeNomCat(con);
+//            listeNomCat(con);
 //            menuLogin();
 
         } catch (ClassNotFoundException ex) {

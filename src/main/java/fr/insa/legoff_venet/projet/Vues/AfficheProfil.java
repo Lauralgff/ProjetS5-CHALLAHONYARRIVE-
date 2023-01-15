@@ -30,12 +30,16 @@ public class AfficheProfil extends MyVerticalLayout {
 
     private VuePrincipale main;
     public TextField textfield = new TextField();
+    public TextField ResearchBar = new TextField();
     public ComboBox<String> RechercheCat = new ComboBox<>();
     Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
     public Button Profil = new Button("Mon profil", new Icon(VaadinIcon.USER));
     public Button AVendre = new Button("Vendre", new Icon(VaadinIcon.WALLET));
     private List<String> items = new ArrayList<>(
             Arrays.asList("Meubles", "Habits", "Sport"));
+    public Button ActRechercheText = new Button ("Rechercher", new Icon(VaadinIcon.SEARCH));
+    public Button ActRechercheCat = new Button ("Rechercher par catégorie", new Icon(VaadinIcon.SEARCH));
+    
 
     public AfficheProfil(VuePrincipale main) {
         this.main = main;
@@ -97,13 +101,16 @@ public class AfficheProfil extends MyVerticalLayout {
         Mesventes.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         Mesventes.addClickListener((event) -> {
             this.main.setMainContent(new MesVentes(this.main));
+            this.main.entete.remove(ResearchBar, RechercheCat,
+                    ActRechercheCat, ActRechercheText);
         });
 
         //Bouton d'affichage des Enchères
         Button MesEncheres = new Button("Mes Enchères", new Icon(VaadinIcon.CART));
         MesEncheres.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         MesEncheres.addClickListener((event) -> {
-            this.main.setMainContent(new MesVentes(this.main));
+            this.main.setMainContent(new MesEncheres(this.main));
+            this.main.entete.remove(ResearchBar, RechercheCat);
         });
 
         //Bouton de deconnexion, retour à la page d'accueil
@@ -118,7 +125,9 @@ public class AfficheProfil extends MyVerticalLayout {
         home.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueilSite(this.main));
             this.main.entete.removeAll();
-            this.main.entete.add(Profil, AVendre, textfield, RechercheCat, Deconnexion);
+            this.main.entete.add(Profil, AVendre, 
+                    textfield, ActRechercheText, 
+                    RechercheCat, ActRechercheCat, Deconnexion);
         });
 
         add(Mesventes, MesEncheres, home);

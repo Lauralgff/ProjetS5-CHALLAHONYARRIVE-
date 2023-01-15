@@ -48,6 +48,8 @@ public class CreerEncheres extends MyVerticalLayout {
     Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
     public Button Profil = new Button("Mon profil", new Icon(VaadinIcon.USER));
     public Button AVendre = new Button("Vendre", new Icon(VaadinIcon.WALLET));
+    public Button ActRechercheText = new Button("Rechercher", new Icon(VaadinIcon.SEARCH));
+    public Button ActRechercheCat = new Button("Rechercher par catégorie", new Icon(VaadinIcon.SEARCH));
 
     private Button valider;
 
@@ -127,7 +129,9 @@ public class CreerEncheres extends MyVerticalLayout {
         home.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueilSite(this.main));
             this.main.entete.removeAll();
-            this.main.entete.add(Profil, AVendre, textfield, this.RechercheCat, Deconnexion);
+            this.main.entete.add(Profil, AVendre,
+                    textfield, ActRechercheText,
+                    this.RechercheCat, ActRechercheCat, Deconnexion);
         });
 
         this.valider = new Button("Valider");
@@ -173,15 +177,15 @@ public class CreerEncheres extends MyVerticalLayout {
                 if (categorie == 0) {
                     Notification.show("Les champs * doivent tous être remplis.");
                 } else {
-                ProjetS5Encheres.createObjet(con, titre, descript,
-                        new Timestamp(System.currentTimeMillis()), fin,
-                        prixbase, categorie, proposepar);
-                this.main.setMainContent(new PageAccueilSite(this.main));
-                this.main.entete.removeAll();
-                this.main.entete.add(Profil, AVendre, textfield, 
-                        RechercheCat, Deconnexion);
-                Notification.show("Vente créée! id de l'objet : " 
-                        + Objet.getIdObjetFromTitre(con, titre));
+                    ProjetS5Encheres.createObjet(con, titre, descript,
+                            new Timestamp(System.currentTimeMillis()), fin,
+                            prixbase, categorie, proposepar);
+                    this.main.setMainContent(new PageAccueilSite(this.main));
+                    this.main.entete.removeAll();
+                    this.main.entete.add(Profil, AVendre, textfield,
+                            RechercheCat, Deconnexion);
+                    Notification.show("Vente créée! id de l'objet : "
+                            + Objet.getIdObjetFromTitre(con, titre));
                 }
             } catch (SQLException ex) {
                 Notification.show("Problème interne : " + ex.getLocalizedMessage());

@@ -158,4 +158,28 @@ public class Objet {
         return id;
     }
 
+    public void setClose(String close) {
+        this.close = close;
+    }
+
+    public void setIdDe(int idDe) {
+        this.idDe = idDe;
+    }
+
+    public void setNomDe(String nomDe) {
+        this.nomDe = nomDe;
+    }
+
+    public String getClose() {
+        return close;
+    }
+
+    public int getIdDe() {
+        return idDe;
+    }
+
+    public String getNomDe() {
+        return nomDe;
+    }
+
 }

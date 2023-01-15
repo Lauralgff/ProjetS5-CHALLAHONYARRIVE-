@@ -61,14 +61,16 @@ public class PageAccueilSite extends MyVerticalLayout {
         this.Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         this.Profil.addClickListener((event) -> {
             this.main.setMainContent(new AfficheProfil(this.main));
-            this.main.entete.remove(ResearchBar, RechercheCat);
+            this.main.entete.remove(ResearchBar, RechercheCat,
+                    ActRechercheCat, ActRechercheText);
         });
 
         //Bouton Vendre, entete
         this.AVendre.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         this.AVendre.addClickListener((event) -> {
             this.main.setMainContent(new CreerEncheres(this.main));
-            this.main.entete.remove(ResearchBar, RechercheCat);
+            this.main.entete.remove(ResearchBar, RechercheCat,
+                    ActRechercheCat, ActRechercheText);
         });
 
         this.main.entete.add(Profil, AVendre);
@@ -137,7 +139,8 @@ public class PageAccueilSite extends MyVerticalLayout {
             this.main.mainContent.add(this.tableau);
         });
         
-        this.main.entete.add(ResearchBar, ActRechercheText,RechercheCat,ActRechercheCat);
+        this.main.entete.add(ResearchBar, ActRechercheText,
+                RechercheCat,ActRechercheCat, Deconnexion);
         
         
         Grid<Objet> TabObjet = new Grid<>(Objet.class, false);

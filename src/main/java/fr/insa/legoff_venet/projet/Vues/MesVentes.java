@@ -48,6 +48,7 @@ public class MesVentes extends MyVerticalLayout {
         TabObjet.addColumn(Objet::getmMax).setHeader("Dernière enchère");
         TabObjet.addColumn(Objet::getFin).setHeader("Fin de l'enchère");
         TabObjet.addColumn(Objet::getNomCat).setHeader("Catégorie");
+        TabObjet.addColumn(Objet::getClose).setHeader("Statut");
 
         try {
 
