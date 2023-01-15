@@ -48,7 +48,7 @@ public class PageAccueilSite extends MyVerticalLayout {
         
         this.main = main;
         
-//------------------------ AFFICHAGE ENTETE ---------------------------------------        
+//------------------------------ AFFICHAGE ENTETE -------------------------------------------      
         
         //Bouton de deconnexion, retour à la page d'accueil      
         this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
