@@ -35,7 +35,7 @@ public class AfficheProfil extends MyVerticalLayout {
     public TextField textfield = new TextField();
     public TextField ResearchBar = new TextField();
     public ComboBox<String> RechercheCat = new ComboBox<>();
-    Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
+    public Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
     public Button Profil = new Button("Mon profil", new Icon(VaadinIcon.USER));
     public Button AVendre = new Button("Vendre", new Icon(VaadinIcon.WALLET));
     private List<String> items = new ArrayList<>();
