@@ -715,6 +715,21 @@ public class ProjetS5Encheres {
             }
         }
     }
+    
+    public static List<String> listeNomCat(Connection con) throws SQLException {
+        List<String> res = new ArrayList<>();
+        try ( PreparedStatement pst = con.prepareStatement(
+        "select nom from categorie1")) {
+            try ( ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    String nom = rs.getString("nom");
+                    res.add(nom);
+                    System.out.println(nom);
+                }
+            }
+        }
+        return res;
+    }
 
     public static List<Objet> listeObjets(Connection con) throws SQLException {
         List<Objet> res = new ArrayList<>();
@@ -1257,8 +1272,6 @@ retournés grâce à leur description */
             pst.setString(1, finalSearch);
             pst.setString(2, finalSearch);
             try ( ResultSet tlu = pst.executeQuery()) {
-//                System.out.println("Résultats obtenus : \n"
-//                        + "--------------------");
                 while (tlu.next()) {
                     int id = tlu.getInt("id");
                     String titre = tlu.getString("titre");
@@ -1298,7 +1311,7 @@ retournés grâce à leur description */
                 + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe "
                 + "from objet1 "
                 + "join categorie1 on categorie1.id = objet1.categorie "
-                + "where categorie like ?")) {
+                + "where nomCat like ?")) {
             pst.setString(1, finalSearch);
             pst.setString(2, finalSearch);
             try ( ResultSet tlu = pst.executeQuery()) {
@@ -1415,8 +1428,8 @@ retournés grâce à leur description */
         } catch (EmailExisteDejaException ex) {
             throw new Error(ex);
         }
-        createCategorie2(con, "Vêtement");
-        createCategorie2(con, "Meuble");
+        createCategorie2(con, "Vêtements");
+        createCategorie2(con, "Meubles");
         createCategorie2(con, "Animaux");
         createCategorie2(con, "Sport");
         createCategorie2(con, "Jeux/Jouets");
@@ -1424,14 +1437,12 @@ retournés grâce à leur description */
         createCategorie2(con, "Bricolage");
         createCategorie2(con, "Décoration");
 
-        Timestamp ts = new Timestamp(0, 0, 0, 0, 0, 0, 0);
-
         createObjet(con, "Pull", "En laine",
                 convert(GetDate(-10)), convert(GetDate(-2)),
-                2000, 2, 1);
+                2000, 1, 1);
         createObjet(con, "Bureau", "En bois avec quatre pieds",
                 convert(GetDate(-30)), convert(GetDate(5)),
-                10000, 1, 1);
+                10000, 2, 1);
         createObjet(con, "Cage à oiseaux", "En métal avec un perchoir",
                 convert(GetDate(-5)), convert(GetDate(15)),
                 5000, 3, 3);
@@ -1556,7 +1567,7 @@ retournés grâce à leur description */
 //            createCategorie(con);
 //            System.out.println("Catégorie créée");
 //            demandeEnchere(con);
-            bilanEncheres(con);
+//            bilanEncheres(con);
 //            bilanVentes(con);
 //            recherche(con);
 //            String email = Console.entreeString("Email : ");
@@ -1570,6 +1581,7 @@ retournés grâce à leur description */
 //            afficheVentesEnCours(con);
 //            Categorie.getIdCatFromNom(con, "Meuble");
 //            System.out.println(ventesEnCours(con));
+            listeNomCat(con);
 //            menuLogin();
 
         } catch (ClassNotFoundException ex) {

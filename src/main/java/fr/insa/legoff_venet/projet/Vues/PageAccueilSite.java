@@ -29,8 +29,10 @@ import java.util.List;
 public class PageAccueilSite extends MyVerticalLayout {
 
     public VuePrincipale main;
-    private List<String> items = new ArrayList<>(
-            Arrays.asList("Meubles", "Habits", "Sport"));
+//    private List<String> items = new ArrayList<>(
+//            Arrays.asList("Vêtements", "Meubles", "Animaux", "Sport", 
+//                    "Jeux/Jouets", "Automobile", "Bricolage", "Décoration"));
+    private List<String> items = new ArrayList<>();
     public TextField ResearchBar = new TextField();
     public ComboBox<String> RechercheCat = new ComboBox<>();
     Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
@@ -39,17 +41,8 @@ public class PageAccueilSite extends MyVerticalLayout {
 
     public PageAccueilSite(VuePrincipale main) {
 
+        
         this.main = main;
-        //Barre de recherche par catégories
-        this.RechercheCat.setAllowCustomValue(true);
-        this.RechercheCat.setPlaceholder("Rechercher par catégorie");
-        this.RechercheCat.addCustomValueSetListener(e -> {
-            String customValue = e.getDetail();
-            items.add(customValue);
-            RechercheCat.setItems(items);
-            RechercheCat.setValue(customValue);
-        });
-        RechercheCat.setItems(items);
 
         //Barre de recherche textuelle
         this.ResearchBar.setPlaceholder("Search");
@@ -66,17 +59,36 @@ public class PageAccueilSite extends MyVerticalLayout {
         this.Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         this.Profil.addClickListener((event) -> {
             this.main.setMainContent(new AfficheProfil(this.main));
+            this.main.entete.remove(ResearchBar, RechercheCat);
         });
 
         //Bouton Vendre, entete
         this.AVendre.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         this.AVendre.addClickListener((event) -> {
             this.main.setMainContent(new CreerEncheres(this.main));
+            this.main.entete.remove(ResearchBar, RechercheCat);
         });
 
         this.main.entete.add(Profil, AVendre, ResearchBar, RechercheCat, Deconnexion);
         
         Connection con = this.main.getSessionInfo().getCon();
+        
+        //Barre de recherche par catégories
+        this.RechercheCat.setAllowCustomValue(true);
+        this.RechercheCat.setPlaceholder("Rechercher par catégorie");
+        try {
+        items = ProjetS5Encheres.listeNomCat(con);
+        } catch (SQLException ex) {
+            
+        }
+        this.RechercheCat.addCustomValueSetListener(e -> {
+            String customValue = e.getDetail();
+            items.add(customValue);
+            RechercheCat.setItems(items);
+            RechercheCat.setValue(customValue);
+        });
+        RechercheCat.setItems(items);
+        
         Grid<Objet> TabObjet = new Grid<>(Objet.class, false);
         TabObjet.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
         TabObjet.addColumn(Objet::getDescription).setHeader("Description");
