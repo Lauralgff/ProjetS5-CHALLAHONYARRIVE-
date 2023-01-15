@@ -81,14 +81,13 @@ public class PageAccueilSite extends MyVerticalLayout {
         TabObjet.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
         TabObjet.addColumn(Objet::getDescription).setHeader("Description");
         TabObjet.addColumn(Objet::getPrixbase).setHeader("Prix de départ €");
+        TabObjet.addColumn(Objet::getmMax).setHeader("Dernière enchère");
         TabObjet.addColumn(Objet::getFin).setHeader("Fin de l'enchère");
-//        TabObjet.addColumn(Categorie.getNomCatFromId(con, Objet::getCategorie))
-//                .setHeader("Catégorie");
-        TabObjet.addColumn(Objet::getCategorie).setHeader("Cat");
+        TabObjet.addColumn(Objet::getNomCat).setHeader("Catégorie");
 
         try {
 
-            List<Objet> ListObjet = ProjetS5Encheres.listeObjets(con);
+            List<Objet> ListObjet = ProjetS5Encheres.ventesEnCours(con);
             TabObjet.setItems(ListObjet);
             this.add(TabObjet);
         } catch (SQLException ex) {

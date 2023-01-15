@@ -24,6 +24,9 @@ public class Objet {
     private int prixbase;
     private int categorie;
     private int proposepar;
+    
+    private int mMax;
+    private String nomCat;
 
     public Objet(int id, String titre, String description, Timestamp debut,
             Timestamp fin, int prixbase, int categorie, int proposepar) {
@@ -35,6 +38,21 @@ public class Objet {
         this.prixbase = prixbase;
         this.categorie = categorie;
         this.proposepar = proposepar;
+    }
+    
+    public Objet(int id, String titre, String description, Timestamp debut,
+            Timestamp fin, int prixbase, int categorie, int proposepar, 
+            int mMax, String nomCat) {
+        this.id = id;
+        this.titre = titre;
+        this.description = description;
+        this.debut = debut;
+        this.fin = fin;
+        this.prixbase = prixbase;
+        this.categorie = categorie;
+        this.proposepar = proposepar;
+        this.mMax = mMax;
+        this.nomCat = nomCat;
     }
 
     public int getId() {
@@ -99,6 +117,22 @@ public class Objet {
 
     public void setProposepar(int proposepar) {
         this.proposepar = proposepar;
+    }
+
+    public int getmMax() {
+        return mMax;
+    }
+
+    public String getNomCat() {
+        return nomCat;
+    }
+
+    public void setmMax(int mMax) {
+        this.mMax = mMax;
+    }
+
+    public void setNomCat(String nomCat) {
+        this.nomCat = nomCat;
     }
 
     public static int getIdObjetFromTitre(Connection con, String titre)
