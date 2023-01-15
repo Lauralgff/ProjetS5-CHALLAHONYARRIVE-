@@ -41,8 +41,7 @@ import java.time.LocalTime;
 public class CreerEncheres extends MyVerticalLayout {
 
     private VuePrincipale main;
-    private List<String> items = new ArrayList<>(
-            Arrays.asList("Meuble", "Habits", "Sport"));
+    private List<String> items = new ArrayList<>();
     public TextField textfield = new TextField();
     public ComboBox<String> RechercheCat = new ComboBox<>();
     Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
@@ -60,10 +59,12 @@ public class CreerEncheres extends MyVerticalLayout {
     private TimePicker to;
     private ComboBox<String> ChoixCat;
 
-    public CreerEncheres(VuePrincipale main) {
+    public CreerEncheres(VuePrincipale main) throws SQLException {
 
         this.main = main;
 
+        Connection con = this.main.getSessionInfo().getCon();
+        
         this.add(new H1("Créez votre enchère !"));
         title = new TextField("Titre *");
         prix = new TextField("Prix de départ *");
@@ -72,9 +73,9 @@ public class CreerEncheres extends MyVerticalLayout {
         description.setWidthFull();
         description.setLabel("Description");
         date = new DatePicker("Date de fin *");
-        to = new TimePicker("Heure de fin *");
         ChoixCat = new ComboBox<>("Catégories *");
         ChoixCat.setAllowCustomValue(true);
+        items = ProjetS5Encheres.listeNomCat(con);
         ChoixCat.addCustomValueSetListener(e -> {
             String customValue = e.getDetail();
             items.add(customValue);
@@ -84,15 +85,15 @@ public class CreerEncheres extends MyVerticalLayout {
         ChoixCat.setItems(items);
 
         FormLayout formLayout = new FormLayout();
-        formLayout.add(title, prix, ChoixCat, description, date, to);
+        formLayout.add(title, prix, ChoixCat, description, date);
         formLayout.setColspan(description, 3);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1),
                 new FormLayout.ResponsiveStep("500px", 2));
         add(formLayout);
 
-        //Barre de recherche textuelle
+        /* //Barre de recherche textuelle
         this.textfield.setPlaceholder("Search");
-        this.textfield.setPrefixComponent(VaadinIcon.SEARCH.create());
+        this.textfield.setPrefixComponent(VaadinIcon.SEARCH.create());*/
 
         //Bouton de deconnexion, retour à la page d'accueil
         this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -102,7 +103,7 @@ public class CreerEncheres extends MyVerticalLayout {
         });
 
         //Bouton profil, entete
-        this.Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
+        /*this.Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         this.Profil.addClickListener((event) -> {
             this.main.setMainContent(new AfficheProfil(this.main));
         });
@@ -122,16 +123,16 @@ public class CreerEncheres extends MyVerticalLayout {
             this.RechercheCat.setItems(items);
             this.RechercheCat.setValue(customValue);
         });
-        this.RechercheCat.setItems(items);
+        this.RechercheCat.setItems(items);*/
 
         Button home = new Button(new Icon(VaadinIcon.HOME));
         home.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         home.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueilSite(this.main));
-            this.main.entete.removeAll();
-            this.main.entete.add(Profil, AVendre,
+            //this.main.entete.removeAll();
+            /*this.main.entete.add(Profil, AVendre,
                     textfield, ActRechercheText,
-                    this.RechercheCat, ActRechercheCat, Deconnexion);
+                    this.RechercheCat, ActRechercheCat, Deconnexion);*/
         });
 
         this.valider = new Button("Valider");
@@ -149,7 +150,8 @@ public class CreerEncheres extends MyVerticalLayout {
 //                    .addDetachListener(detachEvent -> valider.setEnabled(true));
         });
 
-        add(valider, home);
+        add(valider, home,Deconnexion);
+        
     }
 
     public void doCreerEnchere() {
@@ -181,9 +183,9 @@ public class CreerEncheres extends MyVerticalLayout {
                             new Timestamp(System.currentTimeMillis()), fin,
                             prixbase, categorie, proposepar);
                     this.main.setMainContent(new PageAccueilSite(this.main));
-                    this.main.entete.removeAll();
+                    /*this.main.entete.removeAll();
                     this.main.entete.add(Profil, AVendre, textfield,
-                            RechercheCat, Deconnexion);
+                            RechercheCat, Deconnexion);*/
                     Notification.show("Vente créée! id de l'objet : "
                             + Objet.getIdObjetFromTitre(con, titre));
                 }

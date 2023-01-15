@@ -169,11 +169,11 @@ public class AfficheProfil extends MyVerticalLayout {
         });
 
         //Bouton de deconnexion, retour à la page d'accueil
-        /*this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
         this.Deconnexion.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueil(this.main));
             this.main.entete.removeAll(); 
-        });*/
+        });
         
         //Button de retour à la page d'accueil site
         Button home = new Button(new Icon(VaadinIcon.HOME));
@@ -186,7 +186,7 @@ public class AfficheProfil extends MyVerticalLayout {
                     RechercheCat, ActRechercheCat, Deconnexion);*/
         });
 
-        add(Mesventes, MesEncheres, home);
+        add(Mesventes, MesEncheres, home, Deconnexion);
 
         Grid<Objet> TabObjet = new Grid<>(Objet.class, false);
         TabObjet.addColumn(Objet::getTitre).setHeader("Nom de l'objet");
