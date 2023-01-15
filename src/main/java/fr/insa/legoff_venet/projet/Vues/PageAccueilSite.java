@@ -69,7 +69,11 @@ public class PageAccueilSite extends MyVerticalLayout {
         //Bouton Vendre, entete
         this.AVendre.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         this.AVendre.addClickListener((event) -> {
-            this.main.setMainContent(new CreerEncheres(this.main));
+            try {
+                this.main.setMainContent(new CreerEncheres(this.main));
+            } catch (SQLException ex) {
+                Logger.getLogger(PageAccueilSite.class.getName()).log(Level.SEVERE, null, ex);
+            }
             /*this.main.entete.remove(ResearchBar, RechercheCat,
                 ActRechercheCat, ActRechercheText);*/  
             this.main.entete.removeAll();

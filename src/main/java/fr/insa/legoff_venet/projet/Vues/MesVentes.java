@@ -24,6 +24,7 @@ import java.util.List;
  */
 public class MesVentes extends MyVerticalLayout {
     private VuePrincipale main;
+    public Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
         
     public MesVentes (VuePrincipale main){
     this.main = main;
@@ -35,8 +36,15 @@ public class MesVentes extends MyVerticalLayout {
     home.addClickListener((event)-> {
         this.main.setMainContent(new AfficheProfil(this.main));
     });
+    
+    //Bouton de deconnexion, retour à la page d'accueil
+    this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
+    this.Deconnexion.addClickListener((event) -> {
+        this.main.setMainContent(new PageAccueil(this.main));
+        this.main.entete.removeAll(); 
+    });
         
-    add (home);
+    add (home, Deconnexion);
     
     //Affichage de mes objets à vendre
     Connection con = this.main.getSessionInfo().getCon();
