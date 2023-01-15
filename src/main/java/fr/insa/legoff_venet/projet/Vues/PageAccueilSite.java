@@ -31,7 +31,7 @@ public class PageAccueilSite extends MyVerticalLayout {
     public VuePrincipale main;
     private List<String> items = new ArrayList<>(
             Arrays.asList("Meubles", "Habits", "Sport"));
-    public TextField textfield = new TextField();
+    public TextField ResearchBar = new TextField();
     public ComboBox<String> RechercheCat = new ComboBox<>();
     Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
     public Button Profil = new Button("Mon profil", new Icon(VaadinIcon.USER));
@@ -52,8 +52,8 @@ public class PageAccueilSite extends MyVerticalLayout {
         RechercheCat.setItems(items);
 
         //Barre de recherche textuelle
-        this.textfield.setPlaceholder("Search");
-        this.textfield.setPrefixComponent(VaadinIcon.SEARCH.create());
+        this.ResearchBar.setPlaceholder("Search");
+        this.ResearchBar.setPrefixComponent(VaadinIcon.SEARCH.create());
 
         //Bouton de deconnexion, retour à la page d'accueil      
         this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -74,7 +74,7 @@ public class PageAccueilSite extends MyVerticalLayout {
             this.main.setMainContent(new CreerEncheres(this.main));
         });
 
-        this.main.entete.add(Profil, AVendre, textfield, RechercheCat, Deconnexion);
+        this.main.entete.add(Profil, AVendre, ResearchBar, RechercheCat, Deconnexion);
         
         Connection con = this.main.getSessionInfo().getCon();
         Grid<Objet> TabObjet = new Grid<>(Objet.class, false);

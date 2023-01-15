@@ -826,7 +826,7 @@ public class ProjetS5Encheres {
                 + "join utilisateur1 on utilisateur1.id = enchere1.de "
                 + "where sur = objet1.id and montant = ("
                 + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe,"
-                + "objet1.categorie,categorie1.nom as nomCat,prixbase,debut,fin from objet1 "
+                + "categorie1.nom as nomCat from objet1 "
                 + "join categorie1 on categorie1.id = objet1.categorie "
                 + "where exists(select enchere1.sur from enchere1 "
                 + "where enchere1.sur = objet1.id and enchere1.de = ?")) {
@@ -1241,6 +1241,51 @@ retournés grâce à leur description */
 //                }
 //            }
 //        }
+    }
+    
+    public static List<Objet> objetsRecherche(Connection con, String search)
+            throws SQLException {
+        String finalSearch = "%" + search + "%";
+        List<Objet> res = new ArrayList();
+        try ( PreparedStatement pst = con.prepareStatement("select *,"
+                + "(select max(montant) from enchere1 where sur = objet1.id) as mMax,"
+                + "categorie1.nom as nomCat,"
+                + "(select utilisateur1.nom from enchere1 "
+                + "join utilisateur1 on utilisateur1.id = enchere1.de "
+                + "where sur = objet1.id and montant = ("
+                + "select max(montant) from enchere1 where sur = objet1.id)) as nomDe "
+                + "from objet1 "
+                + "join categorie1 on categorie1.id = objet1.categorie "
+                + "where titre like ? or description like ?")) {
+            pst.setString(1, finalSearch);
+            pst.setString(2, finalSearch);
+            try ( ResultSet tlu = pst.executeQuery()) {
+//                System.out.println("Résultats obtenus : \n"
+//                        + "--------------------");
+                while (tlu.next()) {
+                    int id = tlu.getInt("id");
+                    String titre = tlu.getString("titre");
+                    String description = tlu.getString("description");
+                    Timestamp debut = tlu.getTimestamp("debut");
+                    Timestamp fin = tlu.getTimestamp("fin");
+                    int prixbase = tlu.getInt("prixbase");
+                    int mMax = tlu.getInt("mMax");
+                    if (mMax == 0) {
+                        mMax = prixbase;
+                    }
+                    int proposepar = tlu.getInt("proposepar");
+                    int categorie = tlu.getInt("categorie");
+                    String nomCat = tlu.getString("nomCat");
+                    String nomDe = tlu.getString("nomDe");
+                    String close = null;
+                    int idDe = 0;
+                    res.add(new Objet(id, titre, description, debut, fin,
+                            prixbase, categorie, proposepar, mMax, nomCat, 
+                            close, idDe, nomDe));
+                }
+            }
+        }
+        return res;
     }
 
     public static Optional<Utilisateur> login(Connection con)
