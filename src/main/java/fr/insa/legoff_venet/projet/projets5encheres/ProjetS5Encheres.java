@@ -1292,6 +1292,9 @@ public class ProjetS5Encheres {
                 + "bretzel de différents coloris. \nMatière : PP ou PP chargé bois à 30%.",
                 convert(GetDate(-8)), convert(GetDate(16)),
                 25, 8, 5);
+        createObjet(con, "Missile ACME", "Volé à Vil Coyotte",
+                convert(GetDate(-4)), convert(GetDate(8)),
+                1500, 5, 3);
 
         createEnchere2(con, 2, 2, convert(GetDate(-15)), 110);
         createEnchere2(con, 4, 2, convert(GetDate(-5)), 120);
