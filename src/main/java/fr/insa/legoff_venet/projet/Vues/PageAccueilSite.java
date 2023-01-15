@@ -48,7 +48,7 @@ public class PageAccueilSite extends MyVerticalLayout {
         
         this.main = main;
         
-        
+//------------------------ AFFICHAGE ENTETE ---------------------------------------        
         
         //Bouton de deconnexion, retour à la page d'accueil      
         this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -61,16 +61,18 @@ public class PageAccueilSite extends MyVerticalLayout {
         this.Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         this.Profil.addClickListener((event) -> {
             this.main.setMainContent(new AfficheProfil(this.main));
-            this.main.entete.remove(ResearchBar, RechercheCat,
-                    ActRechercheCat, ActRechercheText);
+            /*this.main.entete.remove(ResearchBar, RechercheCat,
+                    ActRechercheCat, ActRechercheText);*/
+            this.main.entete.removeAll();
         });
 
         //Bouton Vendre, entete
         this.AVendre.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         this.AVendre.addClickListener((event) -> {
             this.main.setMainContent(new CreerEncheres(this.main));
-            this.main.entete.remove(ResearchBar, RechercheCat,
-                    ActRechercheCat, ActRechercheText);
+            /*this.main.entete.remove(ResearchBar, RechercheCat,
+                ActRechercheCat, ActRechercheText);*/  
+            this.main.entete.removeAll();
         });
 
         this.main.entete.add(Profil, AVendre);
@@ -81,6 +83,7 @@ public class PageAccueilSite extends MyVerticalLayout {
         this.ResearchBar.setPlaceholder("Search");
         this.ResearchBar.setPrefixComponent(VaadinIcon.SEARCH.create());
         
+        this.ActRechercheText.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         this.ActRechercheText.addClickListener((e) -> {
             this.main.mainContent.removeAll();
             String motcle = ResearchBar.getValue(); 
@@ -142,7 +145,10 @@ public class PageAccueilSite extends MyVerticalLayout {
         this.main.entete.add(ResearchBar, ActRechercheText,
                 RechercheCat,ActRechercheCat, Deconnexion);
         
+//------------------------ AFFICHAGE MAIN CONTENT --------------------------------     
         
+//      Affichage tableau objets en ventes
+
         Grid<Objet> TabObjet = new Grid<>(Objet.class, false);
         TabObjet.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
         TabObjet.addColumn(Objet::getDescription).setHeader("Description");

@@ -17,10 +17,13 @@ import com.vaadin.flow.component.textfield.TextField;
 import fr.insa.legoff_venet.projet.VuePrincipale;
 import fr.insa.legoff_venet.projet.projets5encheres.Objet;
 import fr.insa.legoff_venet.projet.projets5encheres.ProjetS5Encheres;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,10 +38,10 @@ public class AfficheProfil extends MyVerticalLayout {
     Button Deconnexion = new Button(new Icon(VaadinIcon.POWER_OFF));
     public Button Profil = new Button("Mon profil", new Icon(VaadinIcon.USER));
     public Button AVendre = new Button("Vendre", new Icon(VaadinIcon.WALLET));
-    private List<String> items = new ArrayList<>(
-            Arrays.asList("Meubles", "Habits", "Sport"));
+    private List<String> items = new ArrayList<>();
     public Button ActRechercheText = new Button ("Rechercher", new Icon(VaadinIcon.SEARCH));
     public Button ActRechercheCat = new Button ("Rechercher par catégorie", new Icon(VaadinIcon.SEARCH));
+    private Grid<Objet> tableau;
     
 
     public AfficheProfil(VuePrincipale main) {
@@ -69,9 +72,17 @@ public class AfficheProfil extends MyVerticalLayout {
 
         add(avatar, nom, prenom, email, postcode);
 
+        
+        /*Connection con = this.main.getSessionInfo().getCon();
+        
         //Barre de recherche par catégories
         this.RechercheCat.setAllowCustomValue(true);
         this.RechercheCat.setPlaceholder("Rechercher par catégorie");
+        try {
+        items = ProjetS5Encheres.listeNomCat(con);
+        } catch (SQLException ex) {
+            
+        }
         this.RechercheCat.addCustomValueSetListener(e -> {
             String customValue = e.getDetail();
             items.add(customValue);
@@ -79,10 +90,54 @@ public class AfficheProfil extends MyVerticalLayout {
             RechercheCat.setValue(customValue);
         });
         RechercheCat.setItems(items);
+        
+        this.ActRechercheCat.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        this.ActRechercheCat.addClickListener((e) -> {
+            this.main.mainContent.removeAll();
+            
+            String categorie = RechercheCat.getValue();
+            this.tableau = new Grid<>(Objet.class, false);
+            this.tableau.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
+            this.tableau.addColumn(Objet::getDescription).setHeader("Description");
+            this.tableau.addColumn(Objet::getPrixbase).setHeader("Prix de départ €");
+            this.tableau.addColumn(Objet::getmMax).setHeader("Dernière enchère");
+            this.tableau.addColumn(Objet::getFin).setHeader("Fin de l'enchère");
+            this.tableau.addColumn(Objet::getNomCat).setHeader("Catégorie");
+            List<Objet> listeobjet;
+            try {
+                listeobjet = ProjetS5Encheres.objetsRechercheCat (con, categorie);
+                this.tableau.setItems(listeobjet);
+            } catch (SQLException ex) {
+                Logger.getLogger(AfficheProfil.class.getName()).log(Level.SEVERE, null, ex);
+            }       
+            this.main.mainContent.add(this.tableau);
+        });
 
         //Barre de recherche textuelle
         this.textfield.setPlaceholder("Search");
         this.textfield.setPrefixComponent(VaadinIcon.SEARCH.create());
+        
+        this.ActRechercheText.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        this.ActRechercheText.addClickListener((e) -> {
+            this.main.mainContent.removeAll();
+            
+            String motcle = ResearchBar.getValue(); 
+            this.tableau = new Grid<>(Objet.class, false);
+            this.tableau.addColumn(Objet::getTitre).setHeader("Titre de l'objet");
+            this.tableau.addColumn(Objet::getDescription).setHeader("Description");
+            this.tableau.addColumn(Objet::getPrixbase).setHeader("Prix de départ €");
+            this.tableau.addColumn(Objet::getmMax).setHeader("Dernière enchère");
+            this.tableau.addColumn(Objet::getFin).setHeader("Fin de l'enchère");
+            this.tableau.addColumn(Objet::getNomCat).setHeader("Catégorie");
+            List<Objet> listeobjet;
+            try {
+                listeobjet = ProjetS5Encheres.objetsRecherche(con, motcle);
+                this.tableau.setItems(listeobjet);
+            } catch (SQLException ex) {
+                Logger.getLogger(AfficheProfil.class.getName()).log(Level.SEVERE, null, ex);
+            }       
+            this.main.mainContent.add(this.tableau);
+        });
 
         //Bouton profil, entete
         this.Profil.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
@@ -94,7 +149,7 @@ public class AfficheProfil extends MyVerticalLayout {
         this.AVendre.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         this.AVendre.addClickListener((event) -> {
             this.main.setMainContent(new CreerEncheres(this.main));
-        });
+        });*/
 
         //Bouton d'affichage des Ventes
         Button Mesventes = new Button("Mes Ventes", new Icon(VaadinIcon.WALLET));
@@ -110,24 +165,25 @@ public class AfficheProfil extends MyVerticalLayout {
         MesEncheres.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         MesEncheres.addClickListener((event) -> {
             this.main.setMainContent(new MesEncheres(this.main));
-            this.main.entete.remove(ResearchBar, RechercheCat);
+            //this.main.entete.remove(ResearchBar, RechercheCat);
         });
 
         //Bouton de deconnexion, retour à la page d'accueil
-        this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        /*this.Deconnexion.addThemeVariants(ButtonVariant.LUMO_ERROR);
         this.Deconnexion.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueil(this.main));
-            this.main.entete.removeAll();
-        });
+            this.main.entete.removeAll(); 
+        });*/
+        
         //Button de retour à la page d'accueil site
         Button home = new Button(new Icon(VaadinIcon.HOME));
         home.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         home.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueilSite(this.main));
-            this.main.entete.removeAll();
-            this.main.entete.add(Profil, AVendre, 
+            //this.main.entete.removeAll();
+            /*this.main.entete.add(Profil, AVendre, 
                     textfield, ActRechercheText, 
-                    RechercheCat, ActRechercheCat, Deconnexion);
+                    RechercheCat, ActRechercheCat, Deconnexion);*/
         });
 
         add(Mesventes, MesEncheres, home);
