@@ -34,28 +34,24 @@ public class Connexion extends MyVerticalLayout{
     private Button vbRetour;
               
     public Connexion(VuePrincipale main) {
-        
-        
         this.main = main;
         this.vemail = new TextField("Email");
         this.vpass = new PasswordField("Password");
+        this.vbLogin = new Button ("Connexion");
+        this.vbRetour = new Button ("Retour",new Icon(VaadinIcon.ARROW_LEFT));
         this.vbLogin.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_ERROR);
         this.add(this.vemail, this.vpass, this.vbLogin, this.vbRetour);
-        
-        //Bouton valider
-        this.vbLogin = new Button ("Connexion");
         this.vbLogin.addClickListener((event) -> {
             this.doLogin();
+            System.out.println("théoriquement on est connecté");
         });
-        
-        //Bouton de déconnexion
-        this.vbRetour = new Button ("Retour",new Icon(VaadinIcon.ARROW_LEFT));
         this.vbRetour.addThemeVariants(ButtonVariant.LUMO_ERROR);
         this.vbRetour.addClickListener((event) -> {
             this.main.setMainContent(new PageAccueil(this.main));
         });
     }
-//-----------------------------Méthode de connexion ----------------------------
+ 
+//--------------------------------- Méthode Connexion -----------------------------
     public void doLogin() {
         String email = this.vemail.getValue();
         String pass = this.vpass.getValue();
@@ -70,7 +66,6 @@ public class Connexion extends MyVerticalLayout{
                 Notification.show("Bienvenue " 
                         + this.main.getSessionInfo().getUserPrenom()
                         + " (" + this.main.getSessionInfo().getUserId() +")");
-                System.out.println("login oké");
             }
         } catch (SQLException ex) {
             Notification.show("Problème interne : " + ex.getLocalizedMessage());
