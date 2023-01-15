@@ -27,6 +27,9 @@ public class Objet {
     
     private int mMax;
     private String nomCat;
+    private String close;
+    private int idDe;
+    private String nomDe;
 
     public Objet(int id, String titre, String description, Timestamp debut,
             Timestamp fin, int prixbase, int categorie, int proposepar) {
@@ -42,7 +45,7 @@ public class Objet {
     
     public Objet(int id, String titre, String description, Timestamp debut,
             Timestamp fin, int prixbase, int categorie, int proposepar, 
-            int mMax, String nomCat) {
+            int mMax, String nomCat, String close, int idDe, String nomDe) {
         this.id = id;
         this.titre = titre;
         this.description = description;
@@ -53,6 +56,7 @@ public class Objet {
         this.proposepar = proposepar;
         this.mMax = mMax;
         this.nomCat = nomCat;
+        this.close = close;
     }
 
     public int getId() {
