@@ -43,7 +43,7 @@ public class ProjetS5Encheres {
 
     public static Connection defautConnect()
             throws ClassNotFoundException, SQLException {
-        return connectGeneralPostGres("localhost", 5439,
+        return connectGeneralPostGres("localhost", 5432,
                 "postgres", "postgres", "pass");
     }
 
@@ -890,7 +890,6 @@ public class ProjetS5Encheres {
                     String close = null;
                     int idDe = 0;
                     String nomDe = null;
-//                    System.out.println("mMax " + mMax + ", nomCat " + nomCat);
                     res.add(new Objet(id, titre, description, debut, fin,
                             prixbase, categorie, proposepar, mMax, nomCat,
                             close, idDe, nomDe));
@@ -1107,6 +1106,14 @@ public class ProjetS5Encheres {
     public static boolean idUtilisateurExiste(Connection con, int id) throws SQLException {
         try ( PreparedStatement pst = con.prepareStatement("select id from utilisateur1 where id = ?")) {
             pst.setInt(1, id);
+            ResultSet res = pst.executeQuery();
+            return res.next();
+        }
+    }
+    
+    public static boolean emailExiste(Connection con, String email) throws SQLException {
+        try ( PreparedStatement pst = con.prepareStatement("select email from utilisateur1 where email = ?")) {
+            pst.setString(1, email);
             ResultSet res = pst.executeQuery();
             return res.next();
         }

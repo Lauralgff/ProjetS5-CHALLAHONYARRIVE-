@@ -94,6 +94,8 @@ public class Inscription extends MyVerticalLayout {
             } else if (!pass.equals(confPass)) {
                 Notification.show("Le mot de passe et celui de confirmation "
                         + "doivent être identiques.");
+            } else if (ProjetS5Encheres.emailExiste(con, email)) {
+                Notification.show("Cet adresse e-mail existe déjà.");
             } else {
                 ProjetS5Encheres.createUtilisateur(con,nom,prenom,email,pass,codepostal);
                 Optional<Utilisateur> user = ProjetS5Encheres.login2(con, email, pass);
