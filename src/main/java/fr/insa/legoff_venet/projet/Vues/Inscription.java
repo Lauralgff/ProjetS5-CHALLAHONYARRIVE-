@@ -10,8 +10,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import fr.insa.legoff_venet.projet.VuePrincipale;
@@ -32,7 +31,7 @@ public class Inscription extends MyVerticalLayout {
     
     private TextField firstName;
     private TextField lastName;
-    private TextField email;
+    private EmailField email;
     private TextField postCode;
     private PasswordField password;
     private PasswordField confirmPassword;
@@ -47,7 +46,8 @@ public class Inscription extends MyVerticalLayout {
         
         this.firstName = new TextField("Prénom");
         this.lastName = new TextField("Nom");
-        this.email = new TextField("E-mail");
+        this.email = new EmailField("E-mail");
+        email.setErrorMessage("Entrer une adresse mail valide");
         this.postCode = new TextField("Code postal");
         this.password = new PasswordField("Mot de passe");
         this.confirmPassword = new PasswordField("Confirmez votre mot de passe");
